@@ -17,7 +17,7 @@
    <body>
 
 
-<div class="container-fluid bg-light pt-0 pb-3 pl-0 pr-0">
+<div class="container-fluid bg-light pt-0 pb-3 px-0">
     <div class="bg-white shadow-sm pt-5">
         <div class="row pl-3 pr-3">
             <div class="col-0 col-xl-2"></div>
@@ -28,7 +28,7 @@
             <div class="col-6 col-xl-4 align-self-center">
 
                 <div class="text-right">
-                    <a  rel="noopener" href="about.html" style="color:black;text-decoration:none;" class="text-right font-header">About</a>
+                    <a  rel="noopener" href="../about.html" style="color:black;text-decoration:none;" class="text-right font-header">About</a>
                 </div>
             </div>
             <div class="col-0 col-xl-2"></div>
@@ -40,11 +40,11 @@
                 <div class="row">
                     <div class="col-2 col-lg-1">
 
-                        <h4 class="font-regular"><a  rel="noopener" style="color:grey;text-decoration:none;" href="index.html" >精选</a></h4>
+                        <h4 class="font-regular"><a  rel="noopener" style="color:grey;text-decoration:none;" href="../index.html" >精选</a></h4>
                     </div>
 
                     <div class="col-2 col-lg-1">
-                        <h4 class="font-regular text-secondary"><a  rel="noopener" style="color:black;text-decoration:none;" href="all/1.html" >全部</a></h4>
+                        <h4 class="font-regular text-secondary"><a  rel="noopener" style="color:black;text-decoration:none;" href="1.html" >全部</a></h4>
                     </div>
                 </div>
             </div>
@@ -55,7 +55,7 @@
     <br>
 
     {% for item in items %}
-        <div class = "row">
+        <div class = "row p-3">
             <div class="col-md-0 col-xl-2">
             </div>
             <div class="col-md-12 col-xl-8">
@@ -93,11 +93,15 @@
     <div class="row">
         <div class="col-3 col-xl-3"></div>
         <div class="col-3 col-xl-3">
-            <a rel="noopener" href="{{page-1}}.html" style="color:black;text-decoration:none;">Prev</a>
+            {% if page > 1 %}
+            <a rel="noopener" href="{{page-1}}.html" style="color:black;text-decoration:none;" class="font-header">←Prev</a>
+            {% endif %}
         </div>
         <div class="col-3 col-xl-3">
             <div class ="text-right">
-            <a rel="noopener" href="{{page+1}}.html" style="color:black;text-decoration:none;">Next</a>
+            {% if page < page_total %}
+            <a rel="noopener" href="{{page+1}}.html" style="color:black;text-decoration:none;"" class="font-header">Next→</a>
+            {% endif %}
             </div>
         </div>
         <div class="col-3 col-xl-3"></div>

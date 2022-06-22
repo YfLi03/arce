@@ -27,10 +27,11 @@ fn all_render(tera: &Tera, context: &mut Context, template: &str, dst: &str, pic
         pic_vec.push(pic_list[cnt].clone());
         cnt = cnt + 1;
 
-        if (cnt+1) % 15 == 0 || cnt == pic_list.len(){
-            let page = (cnt / 15) + 1;
+        if (cnt+1) % 10 == 0 || cnt == pic_list.len(){
+            let page = (cnt / 10) + 1;
             let mut new_dst = String::from(dst);
             context.insert("page", &page);
+            context.insert("page_total", &((pic_list.len()-1) / 10 + 1));
             context.insert("items", &pic_vec);
             context.insert("url_prefix", "../");
             new_dst += &page.to_string();
