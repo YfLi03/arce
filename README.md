@@ -1,7 +1,9 @@
 # arce
 A *minimal* blog generator for photographers powered by `Rust`.
 Demo: [icera's gallery](http://iceeera.com/pics)
+
 Current Version: `0.1.0`
+
 *The theme is inspired by camarts*
 
 #### Features:
