@@ -7,6 +7,7 @@ use exif::{ In, Tag};
 #[derive(Default)]
 #[derive(Debug)]
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone)]
 pub struct PicInfo{
     date: String,
     url: String,
@@ -86,5 +87,6 @@ pub fn read() -> BinaryHeap<PicInfo>{
     read_pics(&mut pic_list, "./public/gallery/selected".to_string(), true);
     read_pics(&mut pic_list, "./public/gallery/all".to_string(), false);
     //let paths = fs::read_dir("./public/gallery/selected").unwrap();
+    println!("{} pics readed", pic_list.len());
     pic_list
 }

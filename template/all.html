@@ -9,7 +9,7 @@
                                      user-scalable=no">
       <!-- 引入 Bootstrap -->
       <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.1/css/bootstrap.min.css">
-      <link rel="stylesheet" type="text/css" href="css/main.css">
+      <link rel="stylesheet" type="text/css" href="../css/main.css">
       <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.slim.min.js"></script>
       <script src="https://cdn.bootcdn.net/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
       <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.1/js/bootstrap.bundle.min.js"></script>
@@ -44,7 +44,7 @@
                     </div>
 
                     <div class="col-2 col-lg-1">
-                        <h4 class="font-regular text-secondary"><a  rel="noopener" style="color:black;text-decoration:none;" href="all.html" >全部</a></h4>
+                        <h4 class="font-regular text-secondary"><a  rel="noopener" style="color:black;text-decoration:none;" href="all/1.html" >全部</a></h4>
                     </div>
                 </div>
             </div>
@@ -55,13 +55,12 @@
     <br>
 
     {% for item in items %}
-    {% if item.valid %}
         <div class = "row">
             <div class="col-md-0 col-xl-2">
             </div>
             <div class="col-md-12 col-xl-8">
                 <div class="shadow-lg mb-9 bg-white rounded">
-                        <img class="img-fluid center-block" src="{{item.url}}">
+                        <img class="img-fluid center-block" src="{{url_prefix}}{{item.url}}">
                 </div>
 
                 <div class="row pt-2">
@@ -90,8 +89,19 @@
         </div>
         <br>
         <br>
-    {% endif %}
     {% endfor %}
+    <div class="row">
+        <div class="col-3 col-xl-3"></div>
+        <div class="col-3 col-xl-3">
+            <a rel="noopener" href="{{page-1}}.html" style="color:black;text-decoration:none;">Prev</a>
+        </div>
+        <div class="col-3 col-xl-3">
+            <div class ="text-right">
+            <a rel="noopener" href="{{page+1}}.html" style="color:black;text-decoration:none;">Next</a>
+            </div>
+        </div>
+        <div class="col-3 col-xl-3"></div>
+    </div>
 
     <HR style = "FILTER:alpha(opacity=100,finishopacity=0,style=3)"width="95%"  SIZE=3>
     <p style = "margin-bottom: 0" class="text-center font-regular">theme inspired by camarts</p>
