@@ -26,4 +26,8 @@ fn main() {
     renderer::render_main(&web, &config_info, &pic_vec);
 
     println!("Main completed");
+
+    println!("Press any key and Enter to continue...");
+    let mut temp = String::new();
+	std::io::stdin().read_line(&mut temp).expect("Failed to read line");
 }
