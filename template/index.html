@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
    <head>
-      <title>{{title}}</title>
+      <title>{{config.tab_title}}</title>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, 
                                      initial-scale=1.0, 
@@ -23,8 +23,8 @@
         <div class="row pl-3 pr-3">
             <div class="col-0 col-xl-2"></div>
             <div class="col-6 col-xl-4">
-                <h1 class="font-header">ICERA</h1>
-                <p class="font-header">vision</p>
+                <h1 class="font-header">{{config.title}}</h1>
+                <p class="font-header">{{config.subtitle}}</p>
             </div>
             <div class="col-6 col-xl-4 align-self-center">
 
@@ -39,12 +39,12 @@
             <div class="col-0 col-xl-2"></div>
             <div class="col-12 col-xl-8">
                 <div class="row">
-                    <div class="col-2 col-md-1">
+                    <div class="col-2 col-lg-1">
 
                         <h4 class="font-regular"><a  rel="noopener" style="color:black;text-decoration:none;" href="index.html" >精选</a></h4>
                     </div>
 
-                    <div class="col-2 col-md-1">
+                    <div class="col-2 col-lg-1">
                         <h4 class="font-regular text-secondary"><a  rel="noopener" style="color:grey;text-decoration:none;" href="all.html" >全部</a></h4>
                     </div>
                 </div>
@@ -56,7 +56,7 @@
     <br>
 
     {% for item in items %}
-    {% if item.valid %}
+    {% if item.selected %}
         <div class = "row p-3">
             <div class="col-md-0 col-xl-2">
             </div>
@@ -95,8 +95,8 @@
     {% endfor %}
 
     <HR style = "FILTER:alpha(opacity=100,finishopacity=0,style=3)"width="95%"  SIZE=3>
-    <p style = "margin-bottom: 0" class="text-center font-regular">inspired by camarts</p>
-    <p style = "margin-bottom: 0" class="text-center font-regular">icera    &ensp;©&ensp;   2018 - 2022&ensp;&ensp; |&ensp;&ensp;&ensp;<a target="_blank" rel="noopener" href="http://beian.miit.gov.cn/" style="color:black;text-decoration:none;">沪ICP备2022004228号</a></p>
+    <p style = "margin-bottom: 0" class="text-center font-regular">theme inspired by camarts</p>
+    <p style = "margin-bottom: 0" class="text-center font-regular">{{config.footer_info}}&ensp;&ensp; |&ensp;&ensp;&ensp;<a target="_blank" rel="noopener" href="http://beian.miit.gov.cn/" style="color:black;text-decoration:none;">{{config.beian}}</a></p>
     
   </div>
 

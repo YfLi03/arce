@@ -5,7 +5,8 @@ pub struct Config {
     tab_title: String,
     title: String,
     subtitle: String,
-    footer: String,
+    footer_info: String,
+    beian: String,
 }
 
 pub fn read() -> Config {
