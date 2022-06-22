@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>{{title}}</title>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, 
+                                     initial-scale=1.0, 
+                                     maximum-scale=1.0, 
+                                     user-scalable=no">
+      <!-- 引入 Bootstrap -->
+      <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.1/css/bootstrap.min.css">
+      <link rel="stylesheet" type="text/css" href="css/main.css">
+      <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.slim.min.js"></script>
+      <script src="https://cdn.bootcdn.net/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+      <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.1/js/bootstrap.bundle.min.js"></script>
+   </head>
+   <body>
+
+
+  
+  <div class="container-fluid bg-light pt-0 pb-3 pl-0 pr-0">
+    <div class="bg-white shadow-sm pt-5">
+        <div class="row pl-3 pr-3">
+            <div class="col-0 col-xl-2"></div>
+            <div class="col-6 col-xl-4">
+                <h1 class="font-header">ICERA</h1>
+                <p class="font-header">vision</p>
+            </div>
+            <div class="col-6 col-xl-4 align-self-center">
+
+                <div class="text-right">
+                    <a  rel="noopener" href="about.html" style="color:black;text-decoration:none;" class="text-right font-header">About</a>
+                </div>
+            </div>
+            <div class="col-0 col-xl-2"></div>
+        </div>
+        <br>
+        <div class="row pl-3 pr-3">
+            <div class="col-0 col-xl-2"></div>
+            <div class="col-12 col-xl-8">
+                <div class="row">
+                    <div class="col-2 col-md-1">
+
+                        <h4 class="font-regular"><a  rel="noopener" style="color:black;text-decoration:none;" href="index.html" >精选</a></h4>
+                    </div>
+
+                    <div class="col-2 col-md-1">
+                        <h4 class="font-regular text-secondary"><a  rel="noopener" style="color:grey;text-decoration:none;" href="all.html" >全部</a></h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-0 col-xl-2"></div>
+        </div>
+    </div>
+    <br>
+    <br>
+
+    {% for item in items %}
+    {% if item.valid %}
+        <div class = "row p-3">
+            <div class="col-md-0 col-xl-2">
+            </div>
+            <div class="col-md-12 col-xl-8">
+                <div class="shadow-lg mb-9 bg-white rounded">
+                        <img class="img-fluid center-block" src="{{item.url}}">
+                </div>
+
+                <div class="row pt-2">
+                    <div class="col-md-2 col-sm-0 col-0"></div>
+                    <div class="col-md-2 col-sm-6 col-6">
+                        <p style = "margin-bottom: 0" class="text-center small font-regular">标题</p>
+                        <p class="text-center small font-regular">{{item.title}}</p>
+                    </div>
+                    <div class="col-md-2 col-sm-6 col-6">
+                        <p style = "margin-bottom: 0" class="text-center small font-regular">参数</p>
+                        <p class="text-center small font-regular">{{item.parameters}}</p>
+                    </div>
+                    <div class="col-md-2 col-sm-6 col-6">
+                        <p style = "margin-bottom: 0" class="text-center small font-regular">日期</p>
+                        <p class="text-center small font-regular">{{item.date}}</p>
+                    </div>
+                    <div class="col-md-2 col-sm-6 col-6">
+                        <p style = "margin-bottom: 0" class="text-center small font-regular">相机</p>
+                        <p class="text-center small font-regular">{{item.camera}}</p>
+                    </div>
+                    <div class="col-md-2 col-sm-0 col-0"></div>
+                </div>
+            </div>
+            <div class="col-md-0 col-xl-2">
+            </div>
+        </div>
+        <br>
+        <br>
+    {% endif %}
+    {% endfor %}
+
+    <HR style = "FILTER:alpha(opacity=100,finishopacity=0,style=3)"width="95%"  SIZE=3>
+    <p style = "margin-bottom: 0" class="text-center font-regular">inspired by camarts</p>
+    <p style = "margin-bottom: 0" class="text-center font-regular">icera    &ensp;©&ensp;   2018 - 2022&ensp;&ensp; |&ensp;&ensp;&ensp;<a target="_blank" rel="noopener" href="http://beian.miit.gov.cn/" style="color:black;text-decoration:none;">沪ICP备2022004228号</a></p>
+    
+  </div>
+
+  
+
