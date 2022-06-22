@@ -1,2 +1,4 @@
 /target
-/public
+/public/all/*.html
+/public/gallery/all/*.*
+/public/gallery/selected/*.*

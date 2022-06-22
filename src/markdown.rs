@@ -6,7 +6,7 @@ pub fn render(src: String, dst: String){
     let md_str = read_to_string(&src)
         .expect("Cannot read src");
     
-    let mut options = Options::empty();
+    let options = Options::empty();
     //options.insert(Options::ENABLE_STRIKETHROUGH);
     let parser = Parser::new_ext(&md_str, options);
 
