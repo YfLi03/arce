@@ -1,8 +1,7 @@
 use std::collections::BinaryHeap;
-use std::cmp::Ordering;
 use serde::Serialize;
-use std::fs::{self, File};
-use exif::{DateTime, In, Reader, Value, Tag};
+use std::fs::{self};
+use exif::{ In, Tag};
 
 #[derive(Serialize)]
 #[derive(Default)]

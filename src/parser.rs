@@ -1,7 +1,7 @@
 use tera::Tera;
 
 pub fn parse() -> Tera {
-    let tera = match Tera::new("template/*.html") {
+    let tera = match Tera::new("template/**/*.html") {
         Ok(t) => t,
         Err(e) => {
         println!("Parsing error(s): {}", e);

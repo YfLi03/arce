@@ -4,10 +4,12 @@ mod parser;
 mod config;
 mod pic_selector;
 mod renderer;
+mod markdown;
 
 
 fn main() {
     println!("Main Running.");
+    markdown::render("public/about.md".to_string(),"template/partial/about_content.html".to_string());
     
     let web = parser::parse();
     
@@ -21,7 +23,7 @@ fn main() {
         //pic_list.pop();
     }
     
-    renderer::render(&web, &config_info, &pic_vec);
+    renderer::render_main(&web, &config_info, &pic_vec);
 
     println!("Main completed");
 }
