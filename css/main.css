@@ -1,0 +1,9 @@
+@import url('https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@300&family=Open+Sans:wght@700&display=swap');
+
+.font-regular{
+    font-family: 'Noto Serif SC', serif;
+}
+
+.font-header{
+    font-family: 'Open Sans', sans-serif;
+}

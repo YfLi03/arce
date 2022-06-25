@@ -9,7 +9,7 @@ mod markdown;
 
 fn main() {
     println!("Main Running.");
-    markdown::render("public/about.md".to_string(),"template/partial/about_content.html".to_string());
+    markdown::render("about.md".to_string(),"template/partial/about_content.html".to_string());
     
     let web = parser::parse();
     
