@@ -13,8 +13,9 @@ dependencies = [
 
 [[package]]
 name = "arce_blog"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
+ "imagesize",
  "kamadak-exif",
  "pulldown-cmark",
  "serde",
@@ -227,6 +228,12 @@ dependencies = [
  "walkdir",
  "winapi-util",
 ]
+
+[[package]]
+name = "imagesize"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "00b3b62f4e783e38afa07b51eaaa789be2fba03dbe29a05a1a906eb64feb987d"
 
 [[package]]
 name = "indexmap"

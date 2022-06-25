@@ -63,3 +63,5 @@ Clone后使用`cargo  build`即可
 - Serde
 - kamadak-exif
 - pulldown-cmark
+
+*Thanks for the contribution of LauYeeYu*

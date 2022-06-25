@@ -2,6 +2,7 @@ use std::collections::BinaryHeap;
 use serde::Serialize;
 use std::fs::{self};
 use exif::{ In, Tag};
+use imagesize::size;
 
 #[derive(Serialize)]
 #[derive(Default)]
@@ -14,7 +15,8 @@ pub struct PicInfo{
     title: String,
     parameters: String,
     camera: String,
-    selected: bool
+    selected: bool,
+    class: String   //indicating the shape (Landscape, Protrait, Square)
 }
 
 fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool){
@@ -27,11 +29,20 @@ fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool){
         let mut bufreader = std::io::BufReader::new(&file);
         let exifreader = exif::Reader::new();
         let exif = exifreader.read_from_container(&mut bufreader).unwrap();
+
+
+        /*
+        for f in exif.fields() {
+            println!("{} {} {}",
+                     f.tag, f.ifd_num, f.display_value().with_unit(&exif));
+        }
+        */
     
         //process exif  
         let mut date = String::from("");
         let mut parameters = String::from("");
         let mut camera = String::from("");
+        let mut class = String::from("");
 
         if let Some(field) = exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
             date = field.display_value().with_unit(&exif).to_string();
@@ -69,6 +80,23 @@ fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool){
         let title = pic_path.file_name().unwrap().to_string_lossy().into_owned();
         url += &title;
 
+
+        //height and width are not stored in exif.
+        match size(&pic_path) {
+            Ok(r) => {
+                if r.width == r.height {
+                    class = "Square".to_string();
+                }
+                if r.width > r.height {
+                    class = "Landscape".to_string();
+                }
+                if r.width < r.height {
+                    class = "Portrait".to_string();
+                }
+            }
+            Err(err) => println!("Error getting size: {:?}", err)
+        }
+
         //save the pic 
         let item = PicInfo{
             date,
@@ -76,7 +104,8 @@ fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool){
             title,
             parameters,
             camera,
-            selected:is_selected
+            selected:is_selected,
+            class,
         };
         pic_list.push(item);
     }
