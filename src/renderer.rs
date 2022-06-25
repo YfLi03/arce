@@ -1,6 +1,6 @@
 use tera::Tera;
 use tera::Context;
-use std::fs::{File, create_dir_all, copy};
+use std::fs::{File};
 use std::io::Write;
 
 use crate::config::Config;
@@ -45,21 +45,6 @@ fn all_render(tera: &Tera, context: &mut Context, template: &str, dst: &str, pic
     }
 }
 
-fn init_public_folder(){
-    create_dir_all("public/all")
-        .expect("Err Initializing folders");
-    create_dir_all("public/css")
-        .expect("Err Initializing folders");
-    create_dir_all("public/gallery/all")
-        .expect("Err Initializing folders");
-    create_dir_all("public/gallery/selected")
-        .expect("Err Initializing folders");
-    copy("css/main.css", "public/css/main.css")
-        .expect("Err Copying main.css");
-    println!("Initted folders.")
-
-
-}
 
 pub fn render_main(tera: &Tera, config: &Config, pic_list: &Vec<PicInfo>){
 
@@ -68,7 +53,6 @@ pub fn render_main(tera: &Tera, config: &Config, pic_list: &Vec<PicInfo>){
     context.insert("config", &config);
     context.insert("items", &pic_list);
 
-    init_public_folder();
 
     render(&tera, &context, "index.html", "public/index.html");
     render(&tera, &context, "about.html", "public/about.html");

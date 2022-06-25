@@ -5,10 +5,12 @@ mod config;
 mod pic_selector;
 mod renderer;
 mod markdown;
+mod init;
 
 
 fn main() {
     println!("Main Running.");
+    init::init_public_folder();
     markdown::render("about.md".to_string(),"template/partial/about_content.html".to_string());
     
     let web = parser::parse();
