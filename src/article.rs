@@ -37,7 +37,7 @@ pub fn read() -> Vec<ArticleInfo>{
         //getting the dst url
         let mut name = "".to_string();
         lazy_static! {  //using lazy static to save compile time
-            static ref RE: Regex = Regex::new(r"/([A-Za-z0-9_-]+)\.").unwrap();
+            static ref RE: Regex = Regex::new(r"[/\\]([A-Za-z0-9_-]+)\.").unwrap();
         }
         for cap in RE.captures_iter(&article_path) {
             name = cap[1].to_string();
