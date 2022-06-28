@@ -1,22 +1,8 @@
 <!DOCTYPE html>
 <html>
-   <head>
-      <title>{{config.tab_title}}</title>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, 
-                                     initial-scale=1.0, 
-                                     maximum-scale=1.0, 
-                                     user-scalable=no">
-      <!-- 引入 Bootstrap -->
-      <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.1/css/bootstrap.min.css">
-      <link rel="stylesheet" type="text/css" href="css/main.css">
-      <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.slim.min.js"></script>
-      <script src="https://cdn.bootcdn.net/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
-      <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.1/js/bootstrap.bundle.min.js"></script>
-   </head>
-   <body>
+    {% include "partial/head.html" %}
 
-
+<body>
 <div class="container-fluid bg-light pt-0 pb-3 px-0">
     <div class="bg-white shadow-sm pt-5">
         <div class="row pl-3 pr-3">
@@ -66,9 +52,7 @@
 
 
 
-    <HR style = "FILTER:alpha(opacity=100,finishopacity=0,style=3)"width="95%"  SIZE=3>
-    <p style = "margin-bottom: 0" class="text-center font-regular">using arce theme, inspired by camarts</p>
-    <p style = "margin-bottom: 0" class="text-center font-regular">{{config.footer_info}}&ensp;&ensp; |&ensp;&ensp;&ensp;<a target="_blank" rel="noopener" href="http://beian.miit.gov.cn/" style="color:black;text-decoration:none;">{{config.beian}}</a></p>
+    {% include "partial/footer.html" %}
        
   </div>
 

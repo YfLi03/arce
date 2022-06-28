@@ -1,0 +1,50 @@
+<div class = "row p-3">
+    <div class="col-md-0 col-xl-2">
+    </div>
+    <div class="col-md-12 col-xl-8">
+        <div class = "row p-0">
+            {% if item.class == "Landscape" %}
+            <div class="shadow-lg mb-9 bg-white rounded">
+            <img class="img-fluid center-block" src="{{url_prefix}}{{item.url}}">
+            </div>
+            {% endif %}
+
+            {% if item.class == "Square" %}
+            <div class = "col-lg-2 col-md-0"></div>
+            <img class="img-fluid center-block p-0 col-lg-8 col-md-12 shadow-lg mb-9 bg-white rounded" src="{{url_prefix}}{{item.url}}">
+            <div class = "col-lg-2 col-md-0"></div>
+            {% endif %}
+
+            {% if item.class == "Portrait" %}
+            <div class = "col-lg-3 col-md-2 col-sm-1"></div>
+            <img class="img-fluid center-block p-0 col-lg-6 col-md-8 col-sm-10 shadow-lg mb-9 bg-white rounded" src="{{url_prefix}}{{item.url}}">
+            <div class = "col-lg-3 col-md-2 col-sm-1"></div>
+            {% endif %}
+        </div>
+
+        <div class="row pt-2">
+            <div class="col-md-2 col-sm-0 col-0"></div>
+            <div class="col-md-2 col-sm-6 col-6">
+                <p style = "margin-bottom: 0" class="text-center small font-regular">标题</p>
+                <p class="text-center small font-regular">{{item.title}}</p>
+            </div>
+            <div class="col-md-2 col-sm-6 col-6">
+                <p style = "margin-bottom: 0" class="text-center small font-regular">参数</p>
+                <p class="text-center small font-regular">{{item.parameters}}</p>
+            </div>
+            <div class="col-md-2 col-sm-6 col-6">
+                <p style = "margin-bottom: 0" class="text-center small font-regular">日期</p>
+                <p class="text-center small font-regular">{{item.date}}</p>
+            </div>
+            <div class="col-md-2 col-sm-6 col-6">
+                <p style = "margin-bottom: 0" class="text-center small font-regular">相机</p>
+                <p class="text-center small font-regular">{{item.camera}}</p>
+            </div>
+            <div class="col-md-2 col-sm-0 col-0"></div>
+        </div>
+    </div>
+    <div class="col-md-0 col-xl-2">
+    </div>
+</div>
+<br>
+<br>

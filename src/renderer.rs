@@ -34,6 +34,7 @@ fn all_render(tera: &Tera, context: &mut Context, template: &str, dst: &str, pic
             context.insert("page_total", &((pic_list.len()-1) / 10 + 1));
             context.insert("items", &pic_vec);
             context.insert("url_prefix", "../");
+            //Relative Location is used here. May need some amendments.
             new_dst += &page.to_string();
             new_dst +=  &".html".to_string();
             render(&tera, &context, template, &new_dst);
@@ -50,12 +51,14 @@ pub fn render_main(tera: &Tera, config: &Config, pic_list: &Vec<PicInfo>){
 
     //render main
     let mut context = Context::new();
+    
     context.insert("config", &config);
     context.insert("items", &pic_list);
 
-
+    context.insert("url_prefix", "");
     render(&tera, &context, "index.html", "public/index.html");
     render(&tera, &context, "about.html", "public/about.html");
+
     all_render(&tera, &mut context, "all.html", "public/all/", pic_list);
 
 
