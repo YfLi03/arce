@@ -2,9 +2,10 @@
 A *minimal* blog generator for photographers powered by `Rust`.
 Demo: [icera's gallery](http://iceeera.com/pics)
 
-Current Version: `0.1.1`
+Current Version: `0.1.2`
 
 *The theme is inspired by camarts*
+*0.1.2版本对原有架构有一定调整，增加了对于md文章渲染的支持，下述内容有待更新*
 
 #### Features:
 - 三个页面, 精选(单页),所有照片(自动分页),关于(从markdown文件渲染)

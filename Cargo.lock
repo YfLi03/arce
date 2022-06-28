@@ -13,11 +13,13 @@ dependencies = [
 
 [[package]]
 name = "arce_blog"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "imagesize",
  "kamadak-exif",
+ "lazy_static",
  "pulldown-cmark",
+ "regex",
  "serde",
  "serde_json",
  "serde_yaml",

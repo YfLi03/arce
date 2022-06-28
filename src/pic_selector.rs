@@ -111,7 +111,7 @@ fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool){
     }
 }
 
-pub fn read() -> BinaryHeap<PicInfo>{
+pub fn read() -> Vec<PicInfo>{
     let mut pic_list = BinaryHeap::new();
     read_pics(&mut pic_list, "./public/gallery/selected".to_string(), true);
     read_pics(&mut pic_list, "./public/gallery/all".to_string(), false);
@@ -120,5 +120,10 @@ pub fn read() -> BinaryHeap<PicInfo>{
     if pic_list.len() == 0 {
         println!("\x1b[0;31mYou may need to add pictures to the /gallery/all and /gallery/selected folders\x1b[0m")
     }
-    pic_list
+
+    let mut pic_vec = Vec::new();
+    while !pic_list.is_empty() {
+        pic_vec.push(pic_list.pop().unwrap());
+    }
+    pic_vec
 }

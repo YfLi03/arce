@@ -2,9 +2,9 @@ use pulldown_cmark::{Parser, Options, html};
 use std::fs::{File,read_to_string};
 use std::io::Write;
 
-pub fn render(src: String, dst: String){
+pub fn render(src: &str, dst: &str){
     let md_str = read_to_string(&src)
-        .expect("Cannot read src");
+        .expect("Cannot read markdown src");
     
     let options = Options::empty();
     //options.insert(Options::ENABLE_STRIKETHROUGH);
@@ -20,4 +20,16 @@ pub fn render(src: String, dst: String){
         .expect(format!("Could not write to file: ").as_str());
 
     println!("Markdown Rendered: {} to {}", src, dst);
+}
+
+pub fn render_to_string(src: &str) -> String{
+    let md_str = read_to_string(&src)
+        .expect("Cannot read markdown src");
+    
+    let options = Options::empty();
+    //options.insert(Options::ENABLE_STRIKETHROUGH);
+    let parser = Parser::new_ext(&md_str, options);
+    let mut output = String::new();
+    html::push_html(&mut output, parser);
+    output
 }

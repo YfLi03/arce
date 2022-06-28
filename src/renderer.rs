@@ -5,6 +5,7 @@ use std::io::Write;
 
 use crate::config::Config;
 use crate::pic_selector::PicInfo;
+use crate::article::ArticleInfo;
 
 fn render(tera: &Tera, context: &Context, template: &str, dst: &str){
 
@@ -46,8 +47,15 @@ fn all_render(tera: &Tera, context: &mut Context, template: &str, dst: &str, pic
     }
 }
 
+fn article_render(tera: &Tera, context: &mut Context, articles: &Vec<ArticleInfo>){
+    for article in articles {
+        context.insert("body",&article.content);
+        println!("dst{}",&("public/articles/".to_string()+&article.name+".html"));
+        render(&tera, &context, "article.html",&("public/articles/".to_string()+&article.name+".html"));
+    }
+}
 
-pub fn render_main(tera: &Tera, config: &Config, pic_list: &Vec<PicInfo>){
+pub fn render_main(tera: &Tera, config: &Config, pic_list: &Vec<PicInfo>, articles: &Vec<ArticleInfo>){
 
     //render main
     let mut context = Context::new();
@@ -61,5 +69,5 @@ pub fn render_main(tera: &Tera, config: &Config, pic_list: &Vec<PicInfo>){
 
     all_render(&tera, &mut context, "all.html", "public/all/", pic_list);
 
-
+    article_render(&tera, &mut context, &articles);
 }
