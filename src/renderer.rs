@@ -1,11 +1,17 @@
 use tera::Tera;
 use tera::Context;
-use std::fs::{File};
+use std::fs::File;
 use std::io::Write;
+use serde::Serialize;
+use chrono::prelude::*;
 
 use crate::config::Config;
 use crate::pic_selector::PicInfo;
 use crate::article::ArticleInfo;
+
+#[derive(Serialize)]
+#[derive(Debug)]
+struct HeaderConfig(String, String, String);
 
 fn render(tera: &Tera, context: &Context, template: &str, dst: &str){
 
@@ -21,6 +27,9 @@ fn render(tera: &Tera, context: &Context, template: &str, dst: &str){
 
 fn all_render(tera: &Tera, context: &mut Context, template: &str, dst: &str, pic_list: &Vec<PicInfo>){
     //render pages of all
+    let header = HeaderConfig("grey".to_string(),"black".to_string(),"grey".to_string());
+    context.insert("header",&header);
+
     let mut cnt = 0;
     let mut pic_vec = Vec::new();
 
@@ -48,11 +57,43 @@ fn all_render(tera: &Tera, context: &mut Context, template: &str, dst: &str, pic
 }
 
 fn article_render(tera: &Tera, context: &mut Context, articles: &Vec<ArticleInfo>){
+    let header = HeaderConfig("grey".to_string(),"grey".to_string(),"black".to_string());
+    context.insert("header",&header);
+
     for article in articles {
         context.insert("body",&article.content);
-        println!("dst{}",&("public/articles/".to_string()+&article.name+".html"));
         render(&tera, &context, "article.html",&("public/articles/".to_string()+&article.name+".html"));
     }
+}
+
+#[derive(Serialize)]
+#[derive(Debug)]
+struct ArticleIndexItem{
+    name: String,
+    date: String,
+    url: String,
+}
+
+fn article_index_render(tera: &Tera, context: &mut Context, articles: &Vec<ArticleInfo>){
+    let mut items = Vec::new();
+
+    let header = HeaderConfig("grey".to_string(),"grey".to_string(),"black".to_string());
+    context.insert("header",&header);
+    
+    for article in articles {
+        let name = article.name.clone();
+        let url = "/articles/".to_string() + &name + ".html";
+        let naive_datetime = NaiveDateTime::from_timestamp(article.date, 0);
+        let datetime: DateTime<Utc> = DateTime::from_utc(naive_datetime, Utc);
+        let item = ArticleIndexItem{
+            name,
+            date: datetime.to_string(),
+            url
+        };
+        items.push(item);
+    }
+    context.insert("items",&items);
+    render(&tera, &context, "article_index.html","public/article_index.html");
 }
 
 pub fn render_main(tera: &Tera, config: &Config, pic_list: &Vec<PicInfo>, articles: &Vec<ArticleInfo>){
@@ -62,12 +103,17 @@ pub fn render_main(tera: &Tera, config: &Config, pic_list: &Vec<PicInfo>, articl
     
     context.insert("config", &config);
     context.insert("items", &pic_list);
-
     context.insert("url_prefix", "");
+
+    let mut header = HeaderConfig("black".to_string(),"grey".to_string(),"grey".to_string());
+    context.insert("header",&header);
     render(&tera, &context, "index.html", "public/index.html");
+
+    header = HeaderConfig("grey".to_string(),"grey".to_string(),"grey".to_string());
+    context.insert("header",&header);
     render(&tera, &context, "about.html", "public/about.html");
 
     all_render(&tera, &mut context, "all.html", "public/all/", pic_list);
-
     article_render(&tera, &mut context, &articles);
+    article_index_render(&tera, &mut context, &articles);
 }

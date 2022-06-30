@@ -10,7 +10,7 @@ use crate::markdown;
 #[derive(Debug)]
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
 pub struct ArticleInfo{
-    date: u64,
+    pub date: i64,
     pub name: String,
     pub content: String,
 }
@@ -61,7 +61,7 @@ pub fn read() -> Vec<ArticleInfo>{
         
 
         let item = ArticleInfo{
-            date,
+            date:date.try_into().unwrap(),
             name,
             content,            
         };

@@ -4,42 +4,7 @@
 
 <body>
 <div class="container-fluid bg-light pt-0 pb-3 px-0">
-    <div class="bg-white shadow-sm pt-5">
-        <div class="row pl-3 pr-3">
-            <div class="col-0 col-xl-2"></div>
-            <div class="col-6 col-xl-4">
-                <h1 class="font-header">{{config.title}}</h1>
-                <p class="font-header">{{config.subtitle}}</p>
-            </div>
-            <div class="col-6 col-xl-4 align-self-center">
-
-                <div class="text-right">
-                    <a  rel="noopener" href="../about.html" style="color:black;text-decoration:none;" class="text-right font-header">About</a>
-                </div>
-            </div>
-            <div class="col-0 col-xl-2"></div>
-        </div>
-        <br>
-        <div class="row pl-3 pr-3">
-            <div class="col-0 col-xl-2"></div>
-            <div class="col-12 col-xl-8">
-                <div class="row">
-                    <div class="col-3 col-md-2 col-lg-1">
-
-                        <h4 class="font-regular"><a  rel="noopener" style="color:grey;text-decoration:none;" href="../index.html" >精选</a></h4>
-                    </div>
-
-                    <div class="col-3 col-md-2 col-lg-1">
-                        <h4 class="font-regular text-secondary"><a  rel="noopener" style="color:grey;text-decoration:none;" href="../all/1.html" >全部</a></h4>
-                    </div>
-                </div>
-            </div>
-            <div class="col-0 col-xl-2"></div>
-        </div>
-        
-    </div>
-    <br>
-    <br>
+    {% include "partial/header.html" %}
 
     <div class="row p-3">
         <div class="col-0 col-xl-2"></div>
