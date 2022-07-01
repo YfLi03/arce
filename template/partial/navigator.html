@@ -2,14 +2,14 @@
     <div class="row">
         <div class="col-3 col-xl-3"></div>
         <div class="col-3 col-xl-3">
-            {% if has_prev %}
-            <a rel="noopener" href="{{prev}}.html" style="color:black;text-decoration:none;" class="font-header">← {{prev_text}}</a>
+            {% if nav.has_prev %}
+            <a rel="noopener" href="{{nav.prev}}.html" style="color:black;text-decoration:none;" class="font-header">← {{nav.prev_text}}</a>
             {% endif %}
         </div>
         <div class="col-3 col-xl-3">
             <div class ="text-right">
-            {% if has_next %}
-            <a rel="noopener" href="{{next}}.html" style="color:black;text-decoration:none;"" class="font-header">{{next_text}} →</a>
+            {% if nav.has_next %}
+            <a rel="noopener" href="{{nav.next}}.html" style="color:black;text-decoration:none;"" class="font-header">{{nav.next_text}} →</a>
             {% endif %}
             </div>
         </div>

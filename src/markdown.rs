@@ -6,8 +6,8 @@ pub fn render(src: &str, dst: &str){
     let md_str = read_to_string(&src)
         .expect("Cannot read markdown src");
     
-    let options = Options::empty();
-    //options.insert(Options::ENABLE_STRIKETHROUGH);
+    let mut options = Options::empty();
+    options.insert(Options::ENABLE_STRIKETHROUGH);
     let parser = Parser::new_ext(&md_str, options);
 
     let mut html_output = String::new();
@@ -22,12 +22,10 @@ pub fn render(src: &str, dst: &str){
     println!("Markdown Rendered: {} to {}", src, dst);
 }
 
-pub fn render_to_string(src: &str) -> String{
-    let md_str = read_to_string(&src)
-        .expect("Cannot read markdown src");
+pub fn render_str_to_string(md_str: &str) -> String{
     
-    let options = Options::empty();
-    //options.insert(Options::ENABLE_STRIKETHROUGH);
+    let mut options = Options::empty();
+    options.insert(Options::ENABLE_STRIKETHROUGH); 
     let parser = Parser::new_ext(&md_str, options);
     let mut output = String::new();
     html::push_html(&mut output, parser);

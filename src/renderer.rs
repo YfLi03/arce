@@ -12,7 +12,17 @@ use crate::article::ArticleInfo;
 #[derive(Serialize)]
 #[derive(Debug)]
 struct HeaderConfig(String, String, String);
-
+/*
+having some issue with iterator, so not implemented yet. 
+struct NavConfig{
+    has_prev: bool,
+    has_next: bool,
+    next: String,
+    prev: String,
+    next_text: String,
+    prev_text: String
+}
+*/
 fn render(tera: &Tera, context: &Context, template: &str, dst: &str){
 
     let t = tera.render(template, &context).unwrap();
@@ -81,7 +91,7 @@ fn article_index_render(tera: &Tera, context: &mut Context, articles: &Vec<Artic
     context.insert("header",&header);
     
     for article in articles {
-        let name = article.name.clone();
+        let name = article.title.clone();
         let url = "/articles/".to_string() + &name + ".html";
         let naive_datetime = NaiveDateTime::from_timestamp(article.date, 0);
         let datetime: DateTime<Utc> = DateTime::from_utc(naive_datetime, Utc);
