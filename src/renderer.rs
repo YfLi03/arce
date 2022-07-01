@@ -92,7 +92,7 @@ fn article_index_render(tera: &Tera, context: &mut Context, articles: &Vec<Artic
     
     for article in articles {
         let name = article.title.clone();
-        let url = "/articles/".to_string() + &name + ".html";
+        let url = "/articles/".to_string() + &article.name + ".html";
         let naive_datetime = NaiveDateTime::from_timestamp(article.date, 0);
         let datetime: DateTime<Utc> = DateTime::from_utc(naive_datetime, Utc);
         let item = ArticleIndexItem{
