@@ -7,6 +7,7 @@ pub struct Config {
     subtitle: String,
     footer_info: String,
     beian: String,
+    pub compress_image: bool,
 }
 
 pub fn read() -> Config {

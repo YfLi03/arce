@@ -14,7 +14,7 @@ fn main() {
 
     let web = parser::parse();
     let config_info =  config::read();
-    let pic_list = pic_selector::read();
+    let pic_list = pic_selector::read(&config_info);
     
     renderer::render_main(&web, &config_info, &pic_list, &articles);
     println!("Main completed");
