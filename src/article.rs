@@ -74,7 +74,7 @@ pub fn read() -> Vec<ArticleInfo>{
         let mut content = String::new();
         let config = read_with_yaml(&raw_str,&mut content);
         
-        let mut title = String::new();
+        let title;
         let mut date = 0;
         match config.get("title"){
             Some(t) => title = t.to_string(),
@@ -88,7 +88,7 @@ pub fn read() -> Vec<ArticleInfo>{
                 //println!("{}",dt);
                 date = dt.timestamp();
                 if date < 0{
-                    println!("Warning: The timestamp is {}. Make sure you have the yyyy-mm-dd format date.",date);
+                    println!("Warning: The timestamp is \x1b[0;31m{}\x1b[0m. Make sure you have the yyyy-mm-dd format date.",date);
                 }
             },
             None => {}

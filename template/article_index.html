@@ -7,9 +7,9 @@
 <div class="container-fluid bg-light pt-0 pb-3 px-0">
     {% include "partial/header.html" %}
 
-    <div class="row">
-        <div class="col-0 col-xl-2"></div>
-            <div class="col-12 col-xl-8">
+    <div class="row px-3">
+        <div class="col-0 col-lg-2"></div>
+            <div class="col-12 col-lg-8">
                 {% for item in items %}
                 <a rel="noopener" href="{{item.url}}" style="color:black;" class="font-header">
                     <h2>{{item.name}}</h2>
@@ -19,7 +19,7 @@
                 {% endfor %}
 
             </div>
-        <div class="col-0 col-xl-2"></div>
+        <div class="col-0 col-lg-2"></div>
     </div>
 
 
