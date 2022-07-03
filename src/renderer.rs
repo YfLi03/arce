@@ -12,8 +12,9 @@ use crate::article::ArticleInfo;
 #[derive(Serialize)]
 #[derive(Debug)]
 struct HeaderConfig(String, String, String);
-/*
-having some issue with iterator, so not implemented yet. 
+
+
+#[derive(Serialize)]
 struct NavConfig{
     has_prev: bool,
     has_next: bool,
@@ -22,7 +23,7 @@ struct NavConfig{
     next_text: String,
     prev_text: String
 }
-*/
+
 fn render(tera: &Tera, context: &Context, template: &str, dst: &str){
 
     let t = tera.render(template, &context).unwrap();
@@ -66,13 +67,57 @@ fn all_render(tera: &Tera, context: &mut Context, template: &str, dst: &str, pic
     }
 }
 
+fn get_article_url(name: &str)->String{
+    "/articles/".to_string()+&name+".html"
+}
+
 fn article_render(tera: &Tera, context: &mut Context, articles: &Vec<ArticleInfo>){
     let header = HeaderConfig("grey".to_string(),"grey".to_string(),"black".to_string());
     context.insert("header",&header);
 
+    /* 
     for article in articles {
         context.insert("body",&article.content);
         render(&tera, &context, "article.html",&("public/articles/".to_string()+&article.name+".html"));
+    }*/
+    let mut has_prev;
+    let mut prev;
+    let mut prev_text;
+    let mut has_next;
+    let mut next;
+    let mut next_text;
+
+    for i in 0..articles.len(){
+        if i==0 {
+            has_prev = false;
+            prev = String::new();
+            prev_text = String::new();
+        }else{
+            has_prev = true;
+            prev = get_article_url(&articles[i-1].name);
+            prev_text = articles[i-1].title.clone();
+        }
+        if i == articles.len()-1 {
+            has_next = false;
+            next = String::new();
+            next_text = String::new();
+        }else{
+            has_next = true;
+            next = get_article_url(&articles[i+1].name);
+            next_text = articles[i+1].title.clone() ;
+        }
+
+        let nav = NavConfig{
+            has_next,
+            has_prev,
+            next,
+            prev,
+            next_text,
+            prev_text
+        };
+        context.insert("body",&articles[i].content);
+        context.insert("nav",&nav);
+        render(&tera, &context, "article.html",&("public/articles/".to_string()+&articles[i].name+".html"));
     }
 }
 
