@@ -2,6 +2,10 @@
     <div class="col-md-0 col-lg-2">
     </div>
     <div class="col-md-12 col-lg-8">
+        {% if item.has_link %}
+        <a rel="noopener" href="{{item.link}}">
+        {% endif %}
+
         <div class = "row p-0">
             {% if item.class == "Landscape" %}
             <div class="shadow-lg mb-9 bg-white rounded">
@@ -22,11 +26,15 @@
             {% endif %}
         </div>
 
+        {% if item.has_link %}
+        </a>
+        {% endif %}
+
         <div class="row pt-2">
             <div class="col-md-2 col-sm-0 col-0"></div>
             <div class="col-md-2 col-sm-6 col-6">
                 <p style = "margin-bottom: 0" class="text-center small font-regular">标题</p>
-                <p class="text-center small font-regular">{{item.title}}</p>
+                <p class="text-center small font-regular">{{item.name}}</p>
             </div>
             <div class="col-md-2 col-sm-6 col-6">
                 <p style = "margin-bottom: 0" class="text-center small font-regular">参数</p>

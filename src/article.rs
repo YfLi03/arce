@@ -1,4 +1,4 @@
-use std::collections::{BinaryHeap, BTreeMap};
+use std::collections::{BinaryHeap, BTreeMap, HashSet};
 use std::str::FromStr;
 use serde::Serialize;
 use lazy_static::lazy_static;
@@ -13,9 +13,9 @@ use crate::markdown;
 #[derive(Debug)]
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
 pub struct ArticleInfo{
-    pub date: i64,
-    pub title: String,
-    pub name: String,   //the article name for url
+    pub date: i64,      //linux epoch time in seconds
+    pub title: String,  //the title shown
+    pub name: String,   //the article url, with no suffix
     pub content: String,
 }
 
@@ -44,7 +44,7 @@ fn read_with_yaml(raw_str: &str, content: &mut String) -> BTreeMap<String, Strin
     currently, about.html is rendered directly
     other contents are rendered to a String buffer
 */
-pub fn read() -> Vec<ArticleInfo>{
+pub fn read(name_set: &mut HashSet<String>) -> Vec<ArticleInfo>{
 
     markdown::render("source/about.md","template/temp/about_content.html");
     /*  For now, all source pictures are stored in the public folder. 
@@ -67,6 +67,7 @@ pub fn read() -> Vec<ArticleInfo>{
         for cap in RE.captures_iter(&article_path) {
             name = cap[1].to_string();
         }
+        name_set.insert(name.clone());
 
         //doing something with the content
         let raw_str = read_to_string(&article_path)

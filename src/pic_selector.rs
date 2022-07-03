@@ -1,4 +1,4 @@
-use std::{collections::{BinaryHeap,BTreeMap}, io::Write};
+use std::{collections::{BinaryHeap,BTreeMap, HashSet}, io::Write};
 use serde::{Serialize,Deserialize};
 use std::fs::{self};
 use exif::{ In, Tag};
@@ -16,14 +16,16 @@ use crate::config::Config;
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
 #[derive(Clone)]
 pub struct PicInfo{
-    date: String,
-    url: String,
-    title: String,
-    parameters: String,
+    date: String,   //date in string
+    url: String,    //url with suffix
+    name: String,   //name of the picture (to display)
+    parameters: String, //iso info and so on
     camera: String,
-    selected: bool,
+    selected: bool,   
     class: String,   //indicating the shape (Landscape, Portrait, Square)
-    pic_size: u64   //sort of a hash key
+    pic_size: u64,   //used as a hash key to determine whether it's the same pic
+    has_link: bool,  //if it has an article with the same name, a link will be generated automatically
+    link: String,
 }
 
 fn read_pics_json() -> BTreeMap<String, PicInfo>{
@@ -36,7 +38,7 @@ fn read_pics_json() -> BTreeMap<String, PicInfo>{
         }
     }
     let pics: Vec<PicInfo> = serde_json::from_reader(json_str)
-            .expect("pics.yaml has a format error");
+            .expect("pics.json has a format error");
     for pic in pics{
         map.insert(pic.url.clone(), pic);
     }
@@ -53,7 +55,8 @@ fn write_pics_json(map: &BTreeMap<String, PicInfo>){
     f.write(json_str.as_bytes()).unwrap();
 }
 
-fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool, compress: bool, existed: &mut BTreeMap<String, PicInfo>){
+fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool, compress: bool, existed: &mut BTreeMap<String, PicInfo>, article_name_set:&HashSet<String>){
+
     let paths = fs::read_dir(s).unwrap();
     for path in paths{
 
@@ -64,21 +67,46 @@ fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool, c
         let mut bufreader = std::io::BufReader::new(&file);
         let exifreader = exif::Reader::new();
 
-        //basic info
+
+        //get the name with regex
+        let mut name = String::new();
+        lazy_static! {  //using lazy static to save compile time
+            static ref RE: Regex = Regex::new(r"([A-Za-z0-9_-]+)\.").unwrap();
+        }
+        for cap in RE.captures_iter(&pic_path.file_name().unwrap().to_string_lossy()) {
+            name = cap[1].to_string();
+        }
+
+        let link;
+        let has_link;
+        if article_name_set.contains(&name){
+            link = "/articles/".to_string()+&name+".html";
+            has_link = true;
+        }else{
+            link = String::new();
+            has_link = false;
+        }
+
+        //get the url
         let mut url = String::from("gallery/");
         if is_selected {
             url += "selected/"
         }else{
             url+= "all/"
         }
-        //let mut title = pic_path.file_name().unwrap().to_string_lossy().into_owned();
+        //let mut name = pic_path.file_name().unwrap().to_string_lossy().into_owned();
         url += &pic_path.file_name().unwrap().to_string_lossy();
 
         match existed.get(&url){
             Some(pic) => {
                 //if the size matches, no longer need to read all the info
                 if pic.pic_size == pic_size{
-                    pic_list.push(pic.clone());
+                    //but the link info needs to be updated
+                    let mut item = pic.clone();
+                    item.link = link;
+                    item.has_link = has_link;
+
+                    pic_list.push(item);
                     //println!("existed found");
                     continue;
                 }
@@ -124,14 +152,6 @@ fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool, c
             }
         }
 
-        //get the title with regex
-        let mut title = String::new();
-        lazy_static! {  //using lazy static to save compile time
-            static ref RE: Regex = Regex::new(r"([A-Za-z0-9_-]+)\.").unwrap();
-        }
-        for cap in RE.captures_iter(&pic_path.file_name().unwrap().to_string_lossy()) {
-            title = cap[1].to_string();
-        }
 
 
         //height and width are not stored in exif.
@@ -169,26 +189,28 @@ fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool, c
         let item = PicInfo{
             date,
             url:url.clone(),
-            title,
+            name,
             parameters,
             camera,
             selected:is_selected,
             class,
-            pic_size
+            pic_size,
+            link,
+            has_link
         };
         existed.insert(url, item.clone());
         pic_list.push(item);
     }
 }
 
-pub fn read(config: &Config) -> Vec<PicInfo>{
+pub fn read(config: &Config, article_name_set:&HashSet<String>) -> Vec<PicInfo>{
     let mut pic_list = BinaryHeap::new();
     let compress = if config.compress_image {true} else {false};
     let mut existed_pic = read_pics_json();
 
 
-    read_pics(&mut pic_list, "./public/gallery/selected".to_string(), true, compress, &mut existed_pic);
-    read_pics(&mut pic_list, "./public/gallery/all".to_string(), false, compress, &mut existed_pic);
+    read_pics(&mut pic_list, "./public/gallery/selected".to_string(), true, compress, &mut existed_pic, &article_name_set);
+    read_pics(&mut pic_list, "./public/gallery/all".to_string(), false, compress, &mut existed_pic, &article_name_set);
     //let paths = fs::read_dir("./public/gallery/selected").unwrap();
     println!("\x1b[0;31m{}\x1b[0m pics readed", pic_list.len());
     if pic_list.len() == 0 {
