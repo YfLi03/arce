@@ -1,3 +1,6 @@
+/*
+    initting tera
+*/
 use tera::Tera;
 
 pub fn parse() -> Tera {

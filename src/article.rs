@@ -1,3 +1,7 @@
+/*
+Generate the articles (markdown to html str), and the about page
+*/
+
 use std::collections::{BinaryHeap, BTreeMap, HashSet};
 use std::str::FromStr;
 use serde::Serialize;
@@ -16,15 +20,17 @@ pub struct ArticleInfo{
     pub date: i64,      //linux epoch time in seconds
     pub title: String,  //the title shown
     pub name: String,   //the article url, with no suffix
-    pub content: String,
+    pub content: String,//content(html)
 }
 
-
+//some articles has yaml info on the top
+//returns the yaml settings, and also the rendered content
 fn read_with_yaml(raw_str: &str, content: &mut String) -> BTreeMap<String, String>{
 
     let mut config :BTreeMap<String, String> = BTreeMap::new();
     //finding the start loc
     if &raw_str[0..3] != "---" {
+        //if no yaml is found, return directly
         content.push_str(&markdown::render_str_to_string(raw_str));
         return config;
     }
@@ -40,17 +46,16 @@ fn read_with_yaml(raw_str: &str, content: &mut String) -> BTreeMap<String, Strin
     config
 }
 
-/*  the function is used to read all articles, including about.md
-    currently, about.html is rendered directly
-    other contents are rendered to a String buffer
-*/
+//the main function
+//the vec contains the articles, while the name_set is used to determine whether a picture
+//with the same name is found
 pub fn read(name_set: &mut HashSet<String>) -> Vec<ArticleInfo>{
 
     markdown::render("source/about.md","template/temp/about_content.html");
-    /*  For now, all source pictures are stored in the public folder. 
-        May need some change in the future.
+    /*  For now, all source pictures are stored in the public folder.
         Articles are stored in the source/article folder    */
     
+    //using a binaryheap, because articles should be displayed in time order
     let mut articles = BinaryHeap::new();
     let paths = std::fs::read_dir("./source/article").unwrap();
     let mut flag = false;
@@ -58,7 +63,6 @@ pub fn read(name_set: &mut HashSet<String>) -> Vec<ArticleInfo>{
     for path in paths{
         let article_path = path.unwrap().path().display().to_string();
 
-        
         //getting the dst url
         let mut name = "".to_string();
         lazy_static! {  //using lazy static to save compile time
@@ -75,6 +79,7 @@ pub fn read(name_set: &mut HashSet<String>) -> Vec<ArticleInfo>{
         let mut content = String::new();
         let config = read_with_yaml(&raw_str,&mut content);
         
+        //dealing with the arrtibutes of the article
         let title;
         let mut date = 0;
         match config.get("title"){
@@ -94,9 +99,8 @@ pub fn read(name_set: &mut HashSet<String>) -> Vec<ArticleInfo>{
             },
             None => {}
         }
-        //let content = markdown::render_str_to_string(&md_str);
         
-        //getting the date from metadata
+        //if not found in yaml, get the date from metadata
         if date==0{
             let metadata = std::fs::metadata(&article_path).unwrap();
             if let Ok(time) = metadata.modified() {
@@ -119,6 +123,7 @@ pub fn read(name_set: &mut HashSet<String>) -> Vec<ArticleInfo>{
         articles.push(item);
     }
 
+    //returns an ordered vec
     let mut vec = Vec::new();
     while !articles.is_empty(){
         vec.push(articles.pop().unwrap());

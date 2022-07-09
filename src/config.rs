@@ -1,3 +1,7 @@
+/*
+    Read the site's config info.
+*/
+
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Serialize, Deserialize)]

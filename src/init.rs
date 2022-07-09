@@ -1,3 +1,6 @@
+/*
+    Initting the folders
+*/
 use std::fs::{create_dir_all, copy};
 
 pub fn init_public_folder(){

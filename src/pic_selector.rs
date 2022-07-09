@@ -1,3 +1,6 @@
+/*
+    Read the pictures and get their info
+*/
 use std::{collections::{BinaryHeap,BTreeMap, HashSet}, io::Write};
 use serde::{Serialize,Deserialize};
 use std::fs::{self};
@@ -16,18 +19,25 @@ use crate::config::Config;
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
 #[derive(Clone)]
 pub struct PicInfo{
-    date: String,   //date in string
+    date: String,   //date in string (to display and sort)
     url: String,    //url with suffix
     name: String,   //name of the picture (to display)
-    parameters: String, //iso info and so on
+    parameters: String, //iso, shutter speed...
     camera: String,
     selected: bool,   
     class: String,   //indicating the shape (Landscape, Portrait, Square)
     pic_size: u64,   //used as a hash key to determine whether it's the same pic
     has_link: bool,  //if it has an article with the same name, a link will be generated automatically
-    link: String,
+    link: String,   // link to the corresponding image
 }
 
+/*
+    The following two functions are written for the Persistance of data
+    When a pic's info is read, it'll be written to pics.json
+    So the next time, if the program found that the pic's name exists in the pics.json
+    And they have the same size, they'll be regarded as the same file
+    The info in pics.json will be used directly instead of reading again 
+*/
 fn read_pics_json() -> BTreeMap<String, PicInfo>{
     let mut map:BTreeMap<String,PicInfo> = BTreeMap::new();
     let json_str;
@@ -55,12 +65,13 @@ fn write_pics_json(map: &BTreeMap<String, PicInfo>){
     f.write(json_str.as_bytes()).unwrap();
 }
 
+//reading a specific folder
 fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool, compress: bool, existed: &mut BTreeMap<String, PicInfo>, article_name_set:&HashSet<String>){
 
     let paths = fs::read_dir(s).unwrap();
     for path in paths{
 
-        //read exif
+        //read basic info
         let pic_path = path.unwrap().path();
         let mut pic_size =  std::fs::metadata(&pic_path).unwrap().len();
         let file = std::fs::File::open(&pic_path).unwrap();
@@ -68,7 +79,7 @@ fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool, c
         let exifreader = exif::Reader::new();
 
 
-        //get the name with regex
+        //get the name(with no suffix) with regex
         let mut name = String::new();
         lazy_static! {  //using lazy static to save compile time
             static ref RE: Regex = Regex::new(r"([A-Za-z0-9_-]+)\.").unwrap();
@@ -77,6 +88,7 @@ fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool, c
             name = cap[1].to_string();
         }
 
+        //determine if there's an article with the same name
         let link;
         let has_link;
         if article_name_set.contains(&name){
@@ -97,6 +109,7 @@ fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool, c
         //let mut name = pic_path.file_name().unwrap().to_string_lossy().into_owned();
         url += &pic_path.file_name().unwrap().to_string_lossy();
 
+        //if the pic's info is found in pics.json
         match existed.get(&url){
             Some(pic) => {
                 //if the size matches, no longer need to read all the info
@@ -114,13 +127,12 @@ fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool, c
             None => {}
         }
         
-        //exif info
+        //get the exif info ( if exists )
         let mut date = String::from("");
         let mut parameters = String::from("");
         let mut camera = String::from("");
         let mut class = String::from("");
 
-        //read exif if exits
         match exifreader.read_from_container(&mut bufreader){
             Ok(exif) => {
                 if let Some(field) = exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
@@ -212,6 +224,7 @@ pub fn read(config: &Config, article_name_set:&HashSet<String>) -> Vec<PicInfo>{
     read_pics(&mut pic_list, "./public/gallery/selected".to_string(), true, compress, &mut existed_pic, &article_name_set);
     read_pics(&mut pic_list, "./public/gallery/all".to_string(), false, compress, &mut existed_pic, &article_name_set);
     //let paths = fs::read_dir("./public/gallery/selected").unwrap();
+    
     println!("\x1b[0;31m{}\x1b[0m pics readed", pic_list.len());
     if pic_list.len() == 0 {
         println!("\x1b[0;31mYou may need to add pictures to the /gallery/all and /gallery/selected folders\x1b[0m")

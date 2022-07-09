@@ -1,7 +1,12 @@
+/*
+using pulldown_cmark to render md files to html Stringg / file
+*/
+
 use pulldown_cmark::{Parser, Options, html};
 use std::fs::{File,read_to_string};
 use std::io::Write;
 
+//this func renders a source *file* to a dst *file* 
 pub fn render(src: &str, dst: &str){
     let md_str = read_to_string(&src)
         .expect("Cannot read markdown src");
@@ -22,6 +27,7 @@ pub fn render(src: &str, dst: &str){
     println!("Markdown Rendered: {} to {}", src, dst);
 }
 
+//this func render a source var(str) to a String
 pub fn render_str_to_string(md_str: &str) -> String{
     
     let mut options = Options::empty();

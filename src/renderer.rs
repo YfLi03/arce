@@ -1,3 +1,7 @@
+/*
+    render all html pages
+*/
+
 use tera::Tera;
 use tera::Context;
 use std::fs::File;
@@ -9,11 +13,12 @@ use crate::config::Config;
 use crate::pic_selector::PicInfo;
 use crate::article::ArticleInfo;
 
+//header(navigation bar) has differnent colors in different pages
 #[derive(Serialize)]
 #[derive(Debug)]
 struct HeaderConfig(String, String, String);
 
-
+//some pages have bottom navigation bars
 #[derive(Serialize)]
 struct NavConfig{
     has_prev: bool,
@@ -24,6 +29,7 @@ struct NavConfig{
     prev_text: String
 }
 
+//the main render function
 fn render(tera: &Tera, context: &Context, template: &str, dst: &str){
 
     let t = tera.render(template, &context).unwrap();
@@ -36,14 +42,16 @@ fn render(tera: &Tera, context: &Context, template: &str, dst: &str){
     println!("{} rendered", dst);
 }
 
+//render pages in the all category
 fn all_render(tera: &Tera, context: &mut Context, template: &str, dst: &str, pic_list: &Vec<PicInfo>){
-    //render pages of all
+
     let header = HeaderConfig("grey".to_string(),"black".to_string(),"grey".to_string());
     context.insert("header",&header);
 
     let mut cnt = 0;
     let mut pic_vec = Vec::new();
 
+    //pictures will be seperated into different pages automatically
     while cnt < pic_list.len(){
         pic_vec.push(pic_list[cnt].clone());
         cnt = cnt + 1;
@@ -71,6 +79,7 @@ fn get_article_url(name: &str)->String{
     "/articles/".to_string()+&name+".html"
 }
 
+//render the pages in the article category
 fn article_render(tera: &Tera, context: &mut Context, articles: &Vec<ArticleInfo>){
     let header = HeaderConfig("grey".to_string(),"grey".to_string(),"black".to_string());
     context.insert("header",&header);
@@ -80,6 +89,8 @@ fn article_render(tera: &Tera, context: &mut Context, articles: &Vec<ArticleInfo
         context.insert("body",&article.content);
         render(&tera, &context, "article.html",&("public/articles/".to_string()+&article.name+".html"));
     }*/
+
+    //vars for the bottom navigation bar
     let mut has_prev;
     let mut prev;
     let mut prev_text;
@@ -129,6 +140,8 @@ struct ArticleIndexItem{
     url: String,
 }
 
+
+//render the index page for articles
 fn article_index_render(tera: &Tera, context: &mut Context, articles: &Vec<ArticleInfo>){
     let mut items = Vec::new();
 
@@ -156,6 +169,7 @@ pub fn render_main(tera: &Tera, config: &Config, pic_list: &Vec<PicInfo>, articl
     //render main
     let mut context = Context::new();
     
+    //some common context
     context.insert("config", &config);
     context.insert("items", &pic_list);
     context.insert("url_prefix", "");
