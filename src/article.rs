@@ -9,7 +9,7 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use std::time::{UNIX_EPOCH};
 use std::fs::read_to_string;
-use chrono::{NaiveDate};
+use chrono::NaiveDate;
 
 use crate::markdown;
 
@@ -46,9 +46,9 @@ fn read_with_yaml(raw_str: &str, content: &mut String) -> BTreeMap<String, Strin
     config
 }
 
-//the main function
-//the vec contains the articles, while the name_set is used to determine whether a picture
-//with the same name is found
+///the main function
+///the vec contains the articles, while the name_set is used to determine whether a picture
+///with the same name is found
 pub fn read(name_set: &mut HashSet<String>) -> Vec<ArticleInfo>{
 
     markdown::render("source/about.md","template/temp/about_content.html");

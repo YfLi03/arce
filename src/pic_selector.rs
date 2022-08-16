@@ -1,8 +1,9 @@
 /*
     Read the pictures and get their info
 */
-use std::{collections::{BinaryHeap,BTreeMap, HashSet}, io::Write};
+use std::{collections::{BinaryHeap,BTreeMap, HashSet}, io::Write, error::Error};
 use serde::{Serialize,Deserialize};
+use rusqlite::types::ToSql;
 use std::fs::{self};
 use exif::{ In, Tag};
 use imagesize::size;
@@ -11,6 +12,7 @@ use regex::Regex;
 use image::io::Reader as ImageReader;
 
 use crate::config::Config;
+use crate::sql;
 
 #[derive(Serialize)]
 #[derive(Deserialize)]
@@ -29,6 +31,33 @@ pub struct PicInfo{
     pic_size: u64,   //used as a hash key to determine whether it's the same pic
     has_link: bool,  //if it has an article with the same name, a link will be generated automatically
     link: String,   // link to the corresponding image
+}
+
+impl PicInfo{
+    pub fn new(url: String, name: String, pic_size: u64, date: String, parameters: String, camera: String,
+    selected: bool, class: String, has_link: bool, link: String) -> PicInfo{
+        PicInfo{
+            date,
+            url,
+            name,
+            parameters,
+            camera,
+            selected,
+            class,
+            pic_size,
+            has_link,
+            link
+        }
+    }
+
+    pub fn default () -> PicInfo {
+        PicInfo { date: ("22-08-21".to_string()), url: ("1.jpe".to_string()), name: ("test".to_string()), parameters: ("iso200".to_string()), camera: ("a7m3".to_string()), selected: false, class: "portrait".to_string(), pic_size: 327382, has_link: false, link: "".to_string() }
+    }
+
+    pub fn get_sql(&self) -> [&dyn ToSql; 10]{
+        [&self.url as &dyn ToSql, &self.name, &self.pic_size, &self.date, &self.parameters, &self.camera,
+        &self.selected, &self.class, &self.has_link, &self.link]
+    }
 }
 
 /*
@@ -215,11 +244,11 @@ fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool, c
     }
 }
 
-pub fn read(config: &Config, article_name_set:&HashSet<String>) -> Vec<PicInfo>{
+pub fn read(config: &Config, article_name_set:&HashSet<String>) -> Result<Vec<PicInfo>, Box<dyn Error>>{
     let mut pic_list = BinaryHeap::new();
     let compress = if config.compress_image {true} else {false};
     let mut existed_pic = read_pics_json();
-
+    let conn = sql::connect()?;
 
     read_pics(&mut pic_list, "./public/gallery/selected".to_string(), true, compress, &mut existed_pic, &article_name_set);
     read_pics(&mut pic_list, "./public/gallery/all".to_string(), false, compress, &mut existed_pic, &article_name_set);
@@ -235,5 +264,5 @@ pub fn read(config: &Config, article_name_set:&HashSet<String>) -> Vec<PicInfo>{
         pic_vec.push(pic_list.pop().unwrap());
     }
     write_pics_json(&existed_pic);
-    pic_vec
+    Ok(pic_vec)
 }

@@ -17,3 +17,4 @@ image = "0.24.2"
 regex = "1"
 lazy_static = "1.4.0"
 chrono = { version = "0.4", features = ["serde"] }
+rusqlite = { version = "0.28.0", features = ["bundled"] }

@@ -1,5 +1,5 @@
 /*
-    initting tera
+    initiating tera
 */
 use tera::Tera;
 
