@@ -1,9 +1,9 @@
 /*
     Read the pictures and get their info
 */
-use std::{collections::{BinaryHeap,BTreeMap, HashSet}, io::Write, error::Error};
+use std::{collections::{BinaryHeap, HashSet}, error::Error};
 use serde::{Serialize,Deserialize};
-use rusqlite::types::ToSql;
+use rusqlite::{types::ToSql, Connection};
 use std::fs::{self};
 use exif::{ In, Tag};
 use imagesize::size;
@@ -50,10 +50,6 @@ impl PicInfo{
         }
     }
 
-    pub fn default () -> PicInfo {
-        PicInfo { date: ("22-08-21".to_string()), url: ("1.jpe".to_string()), name: ("test".to_string()), parameters: ("iso200".to_string()), camera: ("a7m3".to_string()), selected: false, class: "portrait".to_string(), pic_size: 327382, has_link: false, link: "".to_string() }
-    }
-
     pub fn get_sql(&self) -> [&dyn ToSql; 10]{
         [&self.url as &dyn ToSql, &self.name, &self.pic_size, &self.date, &self.parameters, &self.camera,
         &self.selected, &self.class, &self.has_link, &self.link]
@@ -67,6 +63,7 @@ impl PicInfo{
     And they have the same size, they'll be regarded as the same file
     The info in pics.json will be used directly instead of reading again 
 */
+/* 
 fn read_pics_json() -> BTreeMap<String, PicInfo>{
     let mut map:BTreeMap<String,PicInfo> = BTreeMap::new();
     let json_str;
@@ -93,17 +90,17 @@ fn write_pics_json(map: &BTreeMap<String, PicInfo>){
     let mut f = fs::File::create("./pics.json").unwrap();
     f.write(json_str.as_bytes()).unwrap();
 }
-
+*/
 //reading a specific folder
-fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool, compress: bool, existed: &mut BTreeMap<String, PicInfo>, article_name_set:&HashSet<String>){
+fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool, compress: bool,  article_name_set:&HashSet<String>, db: &Connection) -> Result<(), Box<dyn Error>>{
 
-    let paths = fs::read_dir(s).unwrap();
+    let paths = fs::read_dir(s)?;
     for path in paths{
 
         //read basic info
-        let pic_path = path.unwrap().path();
-        let mut pic_size =  std::fs::metadata(&pic_path).unwrap().len();
-        let file = std::fs::File::open(&pic_path).unwrap();
+        let pic_path = path?.path();
+        let mut pic_size =  std::fs::metadata(&pic_path)?.len();
+        let file = std::fs::File::open(&pic_path)?;
         let mut bufreader = std::io::BufReader::new(&file);
         let exifreader = exif::Reader::new();
 
@@ -139,19 +136,13 @@ fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool, c
         url += &pic_path.file_name().unwrap().to_string_lossy();
 
         //if the pic's info is found in pics.json
-        match existed.get(&url){
-            Some(pic) => {
-                //if the size matches, no longer need to read all the info
-                if pic.pic_size == pic_size{
-                    //but the link info needs to be updated
-                    let mut item = pic.clone();
-                    item.link = link;
-                    item.has_link = has_link;
-
-                    pic_list.push(item);
-                    //println!("existed found");
-                    continue;
-                }
+        match sql::query(&db, &url, pic_size)?{
+            Some(mut pic) => {
+                pic.link = link;
+                pic.has_link = has_link;
+                //Some Info need to be updated
+                pic_list.push(pic);
+                continue;
             },
             None => {}
         }
@@ -162,38 +153,37 @@ fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool, c
         let mut camera = String::from("");
         let mut class = String::from("");
 
-        match exifreader.read_from_container(&mut bufreader){
-            Ok(exif) => {
-                if let Some(field) = exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
-                    date = field.display_value().with_unit(&exif).to_string();
-                }
-                if let Some(field) = exif.get_field(Tag::ExposureTime, In::PRIMARY) {
-                    parameters += &field.display_value().with_unit(&exif).to_string();
-                    parameters += "  ";
-                }
-                if let Some(field) = exif.get_field(Tag::FocalLengthIn35mmFilm, In::PRIMARY) {
-                    parameters += &field.display_value().with_unit(&exif).to_string();
-                    parameters += "  ";
-                }
-                if let Some(field) = exif.get_field(Tag::FNumber, In::PRIMARY) {
-                    parameters += &field.display_value().with_unit(&exif).to_string();
-                    parameters +=  "  ";
-                }
-                if let Some(field) = exif.get_field(Tag::PhotographicSensitivity, In::PRIMARY) {
-                    parameters += "iso";
-                    parameters += &field.display_value().with_unit(&exif).to_string();
-                }
-                if let Some(field) = exif.get_field(Tag::Model, In::PRIMARY) {
-                    camera += &field.display_value().to_string();
-                    camera = camera.replacen("\"","",2);
-                }
+        let exif = match exifreader.read_from_container(&mut bufreader){
+            Ok(exif) => exif,
+            Err(err) => {
+                println!("{} for {}",err, url);
+                continue;
             }
-            Err(e) => {
-                println!("Cannot read Exif \n {}",e);
-            }
+        };
+            
+        if let Some(field) = exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
+            date = field.display_value().with_unit(&exif).to_string();
         }
-
-
+        if let Some(field) = exif.get_field(Tag::ExposureTime, In::PRIMARY) {
+            parameters += &field.display_value().with_unit(&exif).to_string();
+            parameters += "  ";
+        }
+        if let Some(field) = exif.get_field(Tag::FocalLengthIn35mmFilm, In::PRIMARY) {
+            parameters += &field.display_value().with_unit(&exif).to_string();
+            parameters += "  ";
+        }
+        if let Some(field) = exif.get_field(Tag::FNumber, In::PRIMARY) {
+            parameters += &field.display_value().with_unit(&exif).to_string();
+            parameters +=  "  ";
+        }
+        if let Some(field) = exif.get_field(Tag::PhotographicSensitivity, In::PRIMARY) {
+            parameters += "iso";
+            parameters += &field.display_value().with_unit(&exif).to_string();
+        }
+        if let Some(field) = exif.get_field(Tag::Model, In::PRIMARY) {
+            camera += &field.display_value().to_string();
+            camera = camera.replacen("\"","",2);
+        }
 
         //height and width are not stored in exif.
         match size(&pic_path) {
@@ -218,7 +208,7 @@ fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool, c
             println!("May take some time");
 
             //rust's image-rs seems to be very slow
-            let mut image = ImageReader::open(&pic_path).unwrap().decode().unwrap();
+            let mut image = ImageReader::open(&pic_path)?.decode()?;
             let filter = image::imageops::FilterType::Nearest;
             image = image.resize(1920,1920,filter);
             image.save(&pic_path).expect("Error saving the image");
@@ -239,19 +229,21 @@ fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool, c
             link,
             has_link
         };
-        existed.insert(url, item.clone());
+        sql::insert(&db, &item)?;
+        //existed.insert(url, item.clone());
         pic_list.push(item);
     }
+    Ok(())
 }
 
 pub fn read(config: &Config, article_name_set:&HashSet<String>) -> Result<Vec<PicInfo>, Box<dyn Error>>{
     let mut pic_list = BinaryHeap::new();
     let compress = if config.compress_image {true} else {false};
-    let mut existed_pic = read_pics_json();
+    //let mut existed_pic = read_pics_json();
     let conn = sql::connect()?;
 
-    read_pics(&mut pic_list, "./public/gallery/selected".to_string(), true, compress, &mut existed_pic, &article_name_set);
-    read_pics(&mut pic_list, "./public/gallery/all".to_string(), false, compress, &mut existed_pic, &article_name_set);
+    read_pics(&mut pic_list, "./public/gallery/selected".to_string(), true, compress, &article_name_set, &conn)?;
+    read_pics(&mut pic_list, "./public/gallery/all".to_string(), false, compress, &article_name_set, &conn)?;
     //let paths = fs::read_dir("./public/gallery/selected").unwrap();
     
     println!("\x1b[0;31m{}\x1b[0m pics readed", pic_list.len());
@@ -263,6 +255,6 @@ pub fn read(config: &Config, article_name_set:&HashSet<String>) -> Result<Vec<Pi
     while !pic_list.is_empty() {
         pic_vec.push(pic_list.pop().unwrap());
     }
-    write_pics_json(&existed_pic);
+    //write_pics_json(&existed_pic);
     Ok(pic_vec)
 }

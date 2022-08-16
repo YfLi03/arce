@@ -64,7 +64,6 @@ pub fn query(conn: &Connection, url: &str, size: u64) -> Result<Option<PicInfo>>
     let mut stmt = conn.prepare("SELECT * FROM pic_list WHERE size = ?1 ORDER BY id DESC")?;
     let mut rows = stmt.query(&[&size])?;
     while let Some(row) = rows.next()? {
-        println!("I am here");
         let item: PicInfo = PicInfo::new(
             url.to_string(),
             row.get(2)?,
