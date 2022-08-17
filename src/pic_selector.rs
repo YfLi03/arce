@@ -5,7 +5,7 @@ use std::{collections::{BinaryHeap, HashSet}, error::Error};
 use serde::{Serialize,Deserialize};
 use rusqlite::{types::ToSql, Connection};
 use std::fs::{self};
-use exif::{ In, Tag};
+use exif::{In, Tag};
 use imagesize::size;
 use lazy_static::lazy_static;
 use regex::Regex;
@@ -56,41 +56,7 @@ impl PicInfo{
     }
 }
 
-/*
-    The following two functions are written for the Persistance of data
-    When a pic's info is read, it'll be written to pics.json
-    So the next time, if the program found that the pic's name exists in the pics.json
-    And they have the same size, they'll be regarded as the same file
-    The info in pics.json will be used directly instead of reading again 
-*/
-/* 
-fn read_pics_json() -> BTreeMap<String, PicInfo>{
-    let mut map:BTreeMap<String,PicInfo> = BTreeMap::new();
-    let json_str;
-    match fs::File::open("./pics.json"){
-        Ok(t) => json_str = t,
-        Err(_e) =>{
-            return map;
-        }
-    }
-    let pics: Vec<PicInfo> = serde_json::from_reader(json_str)
-            .expect("pics.json has a format error");
-    for pic in pics{
-        map.insert(pic.url.clone(), pic);
-    }
-    return map;
-}
 
-fn write_pics_json(map: &BTreeMap<String, PicInfo>){
-    let mut pic: Vec<PicInfo> = Vec::new();
-    for(_key, val) in map.iter(){
-        pic.push(val.clone());
-    }
-    let json_str = serde_json::to_string(&pic).unwrap();
-    let mut f = fs::File::create("./pics.json").unwrap();
-    f.write(json_str.as_bytes()).unwrap();
-}
-*/
 //reading a specific folder
 fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool, compress: bool,  article_name_set:&HashSet<String>, db: &Connection) -> Result<(), Box<dyn Error>>{
 

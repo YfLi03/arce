@@ -1,7 +1,5 @@
 use std::collections::HashSet;
 
-use crate::pic_selector::PicInfo;
-
 mod parser;
 mod config;
 mod pic_selector;
@@ -21,7 +19,7 @@ fn main() {
     println!("{:?}",t);
     */
     
-    init::init_public_folder();
+    init::init_public_folder().expect("Error initializing the folders");
     
     let web = parser::parse();
     let config_info =  config::read();
