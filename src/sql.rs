@@ -2,28 +2,47 @@
 use rusqlite::{Connection, Result};
 use crate::pic_selector::PicInfo;
 
-pub fn connect() -> Result<Connection> {
-    let conn = Connection::open("pics.db")?;
-    conn.execute(
-        "create table if not exists pic_list (
-            id      INTEGER     PRIMARY KEY AUTOINCREMENT,
-            url     TEXT        NOT NULL,
-            name   TEXT        NOT NULL,
-            size    INTEGER     NOT NULL,
-            date    TEXT,
-            parameters  TEXT,
-            camera      TEXT,
-            selected    BOOLEAN,
-            class       TEXT,
-            has_link    BOOLEAN,
-            link        TEXT
-        )",[]).unwrap();
+pub enum ConnectMode{
+    Pics,
+    Articles,
+    None
+}
+
+///connect to db
+pub fn connect(dst:&str, c: &ConnectMode) -> Result<Connection> {
+    let conn = Connection::open(dst)?;
+    if let Pics = c {
+        conn.execute(
+            "create table if not exists pic_list (
+                id      INTEGER     PRIMARY KEY AUTOINCREMENT,
+                url     TEXT        NOT NULL,
+                name   TEXT        NOT NULL,
+                size    INTEGER     NOT NULL,
+                date    TEXT,
+                parameters  TEXT,
+                camera      TEXT,
+                selected    BOOLEAN,
+                class       TEXT,
+                has_link    BOOLEAN,
+                link        TEXT
+            )",[]).unwrap();
+        }
+
+    if let Articles = c {
+        conn.execute(
+            "create table if not exists articles (
+                id      INTEGER     PRIMARY KEY AUTOINCREMENT,
+                title     TEXT        NOT NULL,
+                name   TEXT        NOT NULL,    
+                content    INTEGER     NOT NULL
+            )",[]).unwrap();
+    }    
     Ok(conn)
 }
 
 
-
-pub fn insert(conn: &Connection, pic: &PicInfo) -> Result<()>{
+///insert pic
+pub fn insertp(conn: &Connection, pic: &PicInfo) -> Result<()>{
     let mut stmt =  conn.prepare("INSERT INTO pic_list (url, name, size, date, parameters, camera, selected, class, has_link, link)\
     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)")?;
     stmt.execute(pic.get_sql())?;
@@ -36,7 +55,7 @@ pub fn insert(conn: &Connection, pic: &PicInfo) -> Result<()>{
 ///     - ONE DATA, GET IT
 ///IF NO DATA WITH THE SAME NAME,
 /// SEARCH WITH PIC_SIZE, PRINT THE INFO
-pub fn query(conn: &Connection, url: &str, size: u64) -> Result<Option<PicInfo>>{
+pub fn queryp(conn: &Connection, url: &str, size: u64) -> Result<Option<PicInfo>>{
 //    let mut stmt = conn.prepare("SELECT id, name, time_created, data FROM person").unwrap();
     let mut stmt = conn.prepare("SELECT * FROM pic_list WHERE url = ?1 ORDER BY id DESC")?;
     let mut rows = stmt.query(&[&url])?;

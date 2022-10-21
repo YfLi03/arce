@@ -37,16 +37,7 @@ impl PicInfo{
     pub fn new(url: String, name: String, pic_size: u64, date: String, parameters: String, camera: String,
     selected: bool, class: String, has_link: bool, link: String) -> PicInfo{
         PicInfo{
-            date,
-            url,
-            name,
-            parameters,
-            camera,
-            selected,
-            class,
-            pic_size,
-            has_link,
-            link
+            date, url, name, parameters, camera, selected, class, pic_size, has_link, link
         }
     }
 
@@ -102,7 +93,7 @@ fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool, c
         url += &pic_path.file_name().unwrap().to_string_lossy();
 
         //if the pic's info is found in pics.json
-        match sql::query(&db, &url, pic_size)?{
+        match sql::queryp(&db, &url, pic_size)?{
             Some(mut pic) => {
                 pic.link = link;
                 pic.has_link = has_link;
@@ -195,8 +186,7 @@ fn read_pics(pic_list: &mut BinaryHeap<PicInfo>, s: String, is_selected: bool, c
             link,
             has_link
         };
-        sql::insert(&db, &item)?;
-        //existed.insert(url, item.clone());
+        sql::insertp(&db, &item)?;
         pic_list.push(item);
     }
     Ok(())
@@ -206,7 +196,7 @@ pub fn read(config: &Config, article_name_set:&HashSet<String>) -> Result<Vec<Pi
     let mut pic_list = BinaryHeap::new();
     let compress = if config.compress_image {true} else {false};
     //let mut existed_pic = read_pics_json();
-    let conn = sql::connect()?;
+    let conn = sql::connect("arce.db", &sql::ConnectMode::Pics)?;
 
     read_pics(&mut pic_list, "./public/gallery/selected".to_string(), true, compress, &article_name_set, &conn)?;
     read_pics(&mut pic_list, "./public/gallery/all".to_string(), false, compress, &article_name_set, &conn)?;

@@ -7,7 +7,7 @@ use std::fs::{read_to_string, File};
 use std::io::Write;
 
 //this func renders a source *file* to a dst *file*
-pub fn render(src: &str, dst: &str) {
+pub fn render_file(src: &str, dst: &str) {
     let md_str = read_to_string(&src).expect("Cannot read markdown src");
 
     let mut options = Options::empty();
@@ -26,7 +26,7 @@ pub fn render(src: &str, dst: &str) {
 }
 
 //this func render a source var(str) to a String
-pub fn render_str_to_string(md_str: &str) -> String {
+pub fn render(md_str: &str) -> String {
     let mut options = Options::empty();
     options.insert(Options::ENABLE_STRIKETHROUGH);
     let parser = Parser::new_ext(&md_str, options);

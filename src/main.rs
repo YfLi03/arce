@@ -12,17 +12,12 @@ mod sql;
 
 fn main() {
     println!("Main Running.");
-    /* 
-    let conn = sql::connect().unwrap();
-    //sql::insert(&conn, &PicInfo::default()).unwrap();
-    let t = sql::query(&conn, "1.jpeg", 327382).unwrap().unwrap();
-    println!("{:?}",t);
-    */
     
     init::init_public_folder().expect("Error initializing the folders");
     
-    let web = parser::parse();
-    let config_info =  config::read();
+    let web = parser::parse().expect("Error loading templates for tera");
+
+    let config_info =  config::read().expect("Error reading the config");
 
     //Render the articles and also get their names
     let mut name_set: HashSet<String> = HashSet::new();

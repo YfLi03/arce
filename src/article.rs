@@ -7,7 +7,7 @@ use std::str::FromStr;
 use serde::Serialize;
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::time::{UNIX_EPOCH};
+use std::time::UNIX_EPOCH;
 use std::fs::read_to_string;
 use chrono::NaiveDate;
 
@@ -31,7 +31,7 @@ fn read_with_yaml(raw_str: &str, content: &mut String) -> BTreeMap<String, Strin
     //finding the start loc
     if &raw_str[0..3] != "---" {
         //if no yaml is found, return directly
-        content.push_str(&markdown::render_str_to_string(raw_str));
+        content.push_str(&markdown::render(raw_str));
         return config;
     }
 
@@ -39,7 +39,7 @@ fn read_with_yaml(raw_str: &str, content: &mut String) -> BTreeMap<String, Strin
     let pos = temp_str.find("---").expect("the markdown doc contains illegal yaml info");
     let md_str = &temp_str[pos+3..temp_str.len()];
     let yaml_str = &temp_str[0..pos];
-    content.push_str(&markdown::render_str_to_string(md_str));
+    content.push_str(&markdown::render(md_str));
     //println!("{}",&yaml_str);
     config = serde_yaml::from_str(yaml_str).unwrap();
     //println!("{:?}",&config);
@@ -51,7 +51,7 @@ fn read_with_yaml(raw_str: &str, content: &mut String) -> BTreeMap<String, Strin
 ///with the same name is found
 pub fn read(name_set: &mut HashSet<String>) -> Vec<ArticleInfo>{
 
-    markdown::render("source/about.md","template/temp/about_content.html");
+    markdown::render_file("source/about.md", "template/temp/about_content.html");
     /*  For now, all source pictures are stored in the public folder.
         Articles are stored in the source/article folder    */
     

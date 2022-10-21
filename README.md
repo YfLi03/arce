@@ -5,13 +5,13 @@ A *minimal* blog generator for photographers powered by `Rust`.
 
 Demo: [icera's gallery](http://iceeera.com)
 
-Current Version: `0.2.3`
+Current Version: `0.2.4`
 
 *The theme is inspired by camarts*
 
 
 
-#### Features:
+## Features:
 - 使用Rust编写——速度很快
 - 简洁大方的主题
 - 响应式UI，意味着在手机和电脑上都能获得较为良好的体验
