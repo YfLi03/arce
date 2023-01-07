@@ -2,8 +2,8 @@
     <div class="row pl-3 pr-3">
         <div class="col-0 col-lg-2"></div>
         <div class="col-6 col-lg-4">
-            <h1 class="font-header">{{config.title}}</h1>
-            <p class="font-header">{{config.subtitle}}</p>
+            <h1 class="font-header">{{global.title}}</h1>
+            <p class="font-header">{{global.subtitle}}</p>
         </div>
         <div class="col-6 col-lg-4 align-self-center">
 
@@ -19,16 +19,21 @@
         <div class="col-12 col-lg-8">
             <div class="row">
                 <div class="col-3 col-md-2 col-lg-2 col-xl-1">
-                    <h4 class="font-regular"><a  rel="noopener" style="color:{{header[0]}};text-decoration:none;" href="/index.html" >精选</a></h4>
+                    <h4 class="font-regular"><a  rel="noopener" style="color:{{page.tcolor[0]}};text-decoration:none;" href="/home/1.html" >主页</a></h4>
                 </div>
 
                 <div class="col-3 col-md-2 col-lg-2 col-xl-1">
-                    <h4 class="font-regular text-secondary"><a  rel="noopener" style="color:{{header[1]}};text-decoration:none;" href="/all/1.html" >全部</a></h4>
+                    <h4 class="font-regular text-secondary"><a  rel="noopener" style="color:{{page.tcolor[1]}};text-decoration:none;" href="/gallery/1.html" >摄影</a></h4>
                 </div>
 
                 <div class="col-3 col-md-2 col-lg-2 col-xl-1">
-                    <h4 class="font-regular text-secondary"><a  rel="noopener" style="color:{{header[2]}};text-decoration:none;" href="/article_index.html" >文章</a></h4>
+                    <h4 class="font-regular text-secondary"><a  rel="noopener" style="color:{{page.tcolor[2]}};text-decoration:none;" href="/category.html" >文章</a></h4>
                 </div>
+
+                <div class="col-3 col-md-2 col-lg-2 col-xl-1">
+                    <h4 class="font-regular text-secondary"><a  rel="noopener" style="color:{{page.tcolor[3]}};text-decoration:none;" href="/picture/1.html" >图库</a></h4>
+                </div>
+
             </div>
         </div>
         <div class="col-0 col-lg-2"></div>
