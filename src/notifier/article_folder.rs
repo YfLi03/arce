@@ -1,28 +1,53 @@
-use notify::{RecommendedWatcher, RecursiveMode, Watcher, Config};
+use notify::event::{CreateKind, RemoveKind, ModifyKind};
+use notify::{RecommendedWatcher, RecursiveMode, Watcher, Config, EventKind};
+use crate::api::folders::{ArticleFolder};
+use crate::api::sync::{NeedPublish};
 use std::path::Path;
+use std::thread;
 
-pub fn main() {
-    println!("watching {}", path);
-    if let Err(e) = watch(path) {
-        println!("error: {:?}", e)
+pub fn watch_folders(folders: Vec<ArticleFolder>, signal: NeedPublish) {
+    
+    for folder in folders {
+        thread::spawn(||{
+            if let Err(e) = watch_article_folder(folder){
+                println!("error: {:?}", e);
+            }
+        });
     }
+    
+    //
 }
 
-fn watch<P: AsRef<Path>>(path: P) -> notify::Result<()> {
+fn watch_article_folder(folder: ArticleFolder) -> notify::Result<()>{
     let (tx, rx) = std::sync::mpsc::channel();
 
-    // Automatically select the best implementation for your platform.
-    // You can also access each implementation directly e.g. INotifyWatcher.
     let mut watcher = RecommendedWatcher::new(tx, Config::default())?;
-
-    // Add a path to be watched. All files and directories at that path and
-    // below will be monitored for changes.
-    watcher.watch(path.as_ref(), RecursiveMode::Recursive)?;
+    watcher.watch(folder.path.as_ref(), RecursiveMode::NonRecursive)?;
 
     for res in rx {
-        match res {
-            Ok(event) => println!("changed: {:?}", event),
-            Err(e) => println!("watch error: {:?}", e),
+        let event = 
+            match res {
+                Ok(event) => event,
+                Err(e) => return Err(e),
+            };
+        match event.kind {
+            EventKind::Create(CreateKind::File) => {
+                
+                // whether markdown
+
+                // whether need to look for publish
+
+                // 
+
+            },
+            EventKind::Modify(ModifyKind::Data(_Content)) => {
+
+            },
+            EventKind::Remove(RemoveKind::File) => {
+
+            },
+
+            _  => {}
         }
     }
 

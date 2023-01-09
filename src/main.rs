@@ -11,6 +11,7 @@ mod sql;
 */
 mod model;
 mod api;
+mod notifier;
 
 
 fn main() {
