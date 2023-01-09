@@ -1,5 +1,5 @@
 use std::collections::HashSet;
-
+/* 
 mod parser;
 mod config;
 mod pic_selector;
@@ -8,9 +8,13 @@ mod markdown;
 mod init;
 mod article;
 mod sql;
+*/
+mod model;
+mod api;
 
 
 fn main() {
+    /* 
     println!("Main Running.");
     
     init::init_public_folder().expect("Error initializing the folders");
@@ -31,5 +35,5 @@ fn main() {
     println!("Press any key and Enter to continue...");
     let mut temp = String::new();
 	std::io::stdin().read_line(&mut temp).expect("Failed to read line");
-    
+    */
 }

@@ -312,7 +312,17 @@ AllPictures:
 
 
 
+### Tech Stack
 
+sqlite, r2d2
+
+tera
+
+pulldown cmark
+
+serde
+
+notify
 
 
 
