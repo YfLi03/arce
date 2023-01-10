@@ -1,9 +1,11 @@
-pub struct Picture{
-    pub hash_old: String,
-    pub hash_new: String,
-    pub filename: PathBuf,
+use std::path::PathBuf;
 
-    pub photography: bool, 
+pub type PPictureList = Vec<PhotographyPicture>;
+pub struct PhotographyPicture{
+    pub hash_old: Option<String>,
+    pub hash: String,
+    pub path: PathBuf,
+
     pub selected: bool,
 
     pub title: String,
@@ -12,5 +14,21 @@ pub struct Picture{
     pub camera: String,
 
     pub article_linked: bool,
-    pub article_link: String,
+    pub article_link: Option<String>,
+}
+
+pub struct Picture{
+    pub hash_old: Option<String>,
+    pub hash: String,
+    pub path: PathBuf,
+}
+
+impl From<PhotographyPicture> for Picture{
+    fn from(p: PhotographyPicture) -> Self {
+        Picture { 
+            hash_old: p.hash_old, 
+            hash: p.hash, 
+            path: p.path 
+        }
+    }
 }
