@@ -57,4 +57,22 @@ impl From<rusqlite::Error> for Error{
     }
 }
 
+impl From<std::io::Error> for Error{
+    fn from(err: std::io::Error) -> Self {
+        Error { 
+            reason: Reason::Internal,
+            message: err.to_string()
+        }
+    }
+}
+
+impl From<notify::Error> for Error{
+    fn from(err: notify::Error) -> Self {
+        Error { 
+            reason: Reason::Filesystem, 
+            message: err.to_string()
+        }
+    }
+}
+
 

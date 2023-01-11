@@ -1,13 +1,20 @@
 use std::sync::{Arc, Mutex};
 
+#[derive(Clone)]
+
 pub struct NeedPublish(Arc<Mutex<bool>>);
+pub type ConnPool = r2d2::Pool<r2d2_sqlite::SqliteConnectionManager>;
 
 impl NeedPublish{
-    fn set(&self, state: bool){
+    pub fn set(&self, state: bool){
         // Poison of this mutex is fatal
         *self.0.lock().unwrap() = state;
     }
-    fn get(&self) -> bool {
+    pub fn get(&self) -> bool {
         *self.0.lock().unwrap()
+    }
+
+    fn new(state: bool) -> Self {
+        NeedPublish(Arc::new(Mutex::new(state)))
     }
 }

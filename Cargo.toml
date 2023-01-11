@@ -20,3 +20,4 @@ chrono = { version = "0.4", features = ["serde"] }
 rusqlite = { version = "0.28.0", features = ["bundled"] }
 notify = "5.0.0"
 r2d2_sqlite = "0.21.0"
+r2d2 = "0.8.10"

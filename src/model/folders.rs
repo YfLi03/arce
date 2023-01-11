@@ -14,6 +14,7 @@ pub fn get_article_folders (conn: &Connection) -> Result<ArticleFolderList, err:
     while let Some(row) = rows.next()? {
         folders.push(ArticleFolder{
             path: PathBuf::from(row.get::<&str, String>("PATH")?),
+            deploy: row.get("DEPLOY")?,
             need_confirm: row.get("CONFIRM")?
         })
     };
@@ -34,9 +35,9 @@ pub fn get_picture_folders (conn: &Connection) -> Result<PictureFolderList, err:
 
 pub fn add_article_folder(conn: &Connection, f: ArticleFolder)-> Result<(), err::Error>{
     let mut stmt = conn.prepare("INSERT INTO article_folders\
-        (PATH, CONFIRM)\
-        VALUES (?1, ?2)")?;
-    stmt.execute(params![f.path.to_str(), f.need_confirm])?;
+        (PATH, CONFIRM, DEPLOY)\
+        VALUES (?1, ?2, ?3)")?;
+    stmt.execute(params![f.path.to_str(), f.need_confirm, f.deploy])?;
     Ok(())
 }
 
@@ -52,6 +53,7 @@ pub fn init (conn: &Connection) -> Result<(), err::Error> {
     conn.execute("CREATE TABLE IF NOT EXISTS article_folders (\
         ID      INTEGER     PRIMARY KEY AUTOINCREMENT,  \
         PATH    TEXT        NOT NULL,\
+        DEPLOY  TEXT        NOT NULL,\
         CONFIRM BOOLEAN     NOT NULL\
         ", [])?;
 
