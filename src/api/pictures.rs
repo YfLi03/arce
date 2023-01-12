@@ -5,7 +5,7 @@ use crate::api::err;
 pub type PPictureList = Vec<PhotographyPicture>;
 
 #[derive(Default)]
-pub struct PhotographyPicture{
+pub struct PhotographyPicture {
     pub hash_old: Option<String>,
     pub hash: String,
     pub path: PathBuf,
@@ -19,8 +19,13 @@ pub struct PhotographyPicture{
     pub camera: String,
 }
 
-impl PhotographyPicture{
-    pub fn from_dir(path: PathBuf, selected: bool, article_link: Option<String>, title: String ) -> Result<Self, err::Error> {
+impl PhotographyPicture {
+    pub fn from_dir(
+        path: PathBuf,
+        selected: bool,
+        article_link: Option<String>,
+        title: String,
+    ) -> Result<Self, err::Error> {
         let bytes = std::fs::read(&path)?;
         let hash = sha256::digest(&*bytes);
         Ok(PhotographyPicture {
@@ -34,18 +39,18 @@ impl PhotographyPicture{
     }
 }
 
-pub struct Picture{
+pub struct Picture {
     pub hash_old: Option<String>,
     pub hash: String,
     pub path: PathBuf,
 }
 
-impl From<PhotographyPicture> for Picture{
+impl From<PhotographyPicture> for Picture {
     fn from(p: PhotographyPicture) -> Self {
-        Picture { 
-            hash_old: p.hash_old, 
-            hash: p.hash, 
-            path: p.path 
+        Picture {
+            hash_old: p.hash_old,
+            hash: p.hash,
+            path: p.path,
         }
     }
 }

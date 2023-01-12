@@ -1,7 +1,6 @@
 use std::path::PathBuf;
 
-
-pub struct GlobalConfig{
+pub struct GlobalConfig {
     pub title: String,
     pub subtitle: String,
     pub foot: String,
@@ -16,5 +15,5 @@ pub struct GlobalConfig{
     pub scp_web_path: String,
 
     pub deploy_auto: bool,
-    pub deploy_interval: Option<usize>
+    pub deploy_interval: Option<usize>,
 }

@@ -5,8 +5,8 @@ use std::sync::{Arc, Mutex};
 pub struct NeedPublish(Arc<Mutex<bool>>);
 pub type ConnPool = r2d2::Pool<r2d2_sqlite::SqliteConnectionManager>;
 
-impl NeedPublish{
-    pub fn set(&self, state: bool){
+impl NeedPublish {
+    pub fn set(&self, state: bool) {
         // Poison of this mutex is fatal
         *self.0.lock().unwrap() = state;
     }

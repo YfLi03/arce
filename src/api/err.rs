@@ -1,5 +1,5 @@
-use std::fmt::{self, Display};
 use serde::Serialize;
+use std::fmt::{self, Display};
 
 #[derive(Clone, Debug, Serialize)]
 pub enum Reason {
@@ -7,17 +7,17 @@ pub enum Reason {
     Filesystem,
     Config,
     Internet,
-    Internal
+    Internal,
 }
 
-impl Display for Reason{
+impl Display for Reason {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let s = match self {
             Reason::Database => "Sqlite or R2d2 Error",
             Reason::Filesystem => "File Notification Error",
             Reason::Config => "config.yaml Error",
             Reason::Internet => "SSH Error",
-            Reason::Internal => "Tera or other Crates Error"
+            Reason::Internal => "Tera or other Crates Error",
         };
         write!(f, "{}", s)
     }
@@ -26,7 +26,7 @@ impl Display for Reason{
 #[derive(Debug, Serialize)]
 pub struct Error {
     pub reason: Reason,
-    pub message: String
+    pub message: String,
 }
 
 impl Display for Error {
@@ -35,44 +35,37 @@ impl Display for Error {
     }
 }
 
-impl std::error::Error for Error {
-
-}
+impl std::error::Error for Error {}
 
 impl Error {
     pub fn new(reason: Reason, message: String) -> Self {
-        Error {
-            reason,
-            message
-        }
+        Error { reason, message }
     }
 }
 
-impl From<rusqlite::Error> for Error{
+impl From<rusqlite::Error> for Error {
     fn from(err: rusqlite::Error) -> Self {
         Error {
             reason: Reason::Database,
-            message: err.to_string()
+            message: err.to_string(),
         }
     }
 }
 
-impl From<std::io::Error> for Error{
+impl From<std::io::Error> for Error {
     fn from(err: std::io::Error) -> Self {
-        Error { 
+        Error {
             reason: Reason::Internal,
-            message: err.to_string()
+            message: err.to_string(),
         }
     }
 }
 
-impl From<notify::Error> for Error{
+impl From<notify::Error> for Error {
     fn from(err: notify::Error) -> Self {
-        Error { 
-            reason: Reason::Filesystem, 
-            message: err.to_string()
+        Error {
+            reason: Reason::Filesystem,
+            message: err.to_string(),
         }
     }
 }
-
-

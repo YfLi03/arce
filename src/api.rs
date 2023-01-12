@@ -3,9 +3,9 @@
  * Only Local Paths use Type PathBuf
  */
 
-pub mod folders;
-pub mod err;
-pub mod sync;
 pub mod articles;
 pub mod config;
+pub mod err;
+pub mod folders;
 pub mod pictures;
+pub mod sync;
