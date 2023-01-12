@@ -120,8 +120,8 @@ param:  [指定文件夹位置]
 
 
 
-1. 监测到新建 publish.md
-2. 对于每一个文件，考察 publish.md 中是否有 SELECTED[XXX], IGNORE[XXX], LINK[XXX]{XXX}, TITLE[XXX]{XXX}字样
+1. 监测到新建 DEPLOY
+2. 对于每一个文件，考察 config.txt 中是否有 SELECTED[XXX], IGNORE[XXX], LINK[XXX]{XXX}, TITLE[XXX]{XXX}字样
 3. 进行照片上传操作
 4. 根据 2 中 flag，将相应地址加入到对应数据库中。
 

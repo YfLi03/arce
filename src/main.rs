@@ -12,6 +12,7 @@ mod sql;
 mod model;
 mod api;
 mod notifier;
+mod picture;
 
 
 fn main() {
