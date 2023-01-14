@@ -2,13 +2,12 @@ use std::path::PathBuf;
 use exif::{In, Tag};
 use imagesize::size;
 use log::{info, warn};
-use once_cell::sync::OnceCell;
-
+use std::process::Command;
 
 use crate::api::err;
-use crate::api::config;
-
-use super::config::GlobalConfig;
+use crate::api::config::GlobalConfig;
+use crate::api::sync::GlobalConnPool;
+use crate::model::pictures::insert_photography_picture;
 
 
 
@@ -140,12 +139,50 @@ impl PhotographyPicture{
     }
 
     pub fn process_and_store(mut self) -> Result<Self, err::Error>{
-        unimplemented!()
+        let config = GlobalConfig::global();
+        let size = std::fs::metadata(&self.path)?.len();
+        if size < config.pic_compress_threshold {
+            self.calc_hash()?;
+            let to = config.pic_local.join(self.hash.clone() + self.path.clone().extension().unwrap().to_str().unwrap());
+            std::fs::copy(self.path, &to)?;
+            self.path = to;
+            return Ok(self);
+        };
+
+        info!("Compressing image {:?}", &self.path);
+        let mut image = image::io::Reader::open(&self.path)?.decode()?;
+        let filter = image::imageops::FilterType::Nearest;
+        image = image.resize(1920,1920,filter);
+
+        let hash = sha256::digest(image.as_bytes());
+        let save= config.pic_local.join(hash + self.path.clone().extension().unwrap().to_str().unwrap());
+        image.save(&save)?;
+        self.path = save.clone();
+        self.hash_old = Some(self.hash.clone());
+        self.calc_hash()?;
+
+        let to = config.pic_local.join(self.hash.clone() + self.path.clone().extension().unwrap().to_str().unwrap());
+        std::fs::rename(save, &to)?;
+        self.path = to;
+
+        Ok(self)
     }
 
-    pub fn register_and_upload(&self) -> Result<(), err::Error> {
-        let CONFIG = GlobalConfig::global();
-        unimplemented!()
+    pub fn register_and_upload(&mut self) -> Result<(), err::Error> {
+        let config= GlobalConfig::global();
+        let conn = GlobalConnPool::global().0.get()?;
+        insert_photography_picture(&conn, self);
+
+        let dst = config.scp_server.clone() + ":" + &config.scp_pic_path + "/" + self.path.file_name().unwrap().to_str().unwrap();
+        match Command::new("scp").arg(&self.path).arg(&dst).output(){
+            Err(e) => {
+                warn!("Upload of picture {:?} to {:?} failed.",&self.path, &dst);
+            },
+            _=>{}
+        };
+        Ok(())
+
+    
     }
 }
 

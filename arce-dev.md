@@ -326,7 +326,8 @@ notify
 
 
 
-
+## TO Check
+1. hash 和 文件名有无关联
 
 
 

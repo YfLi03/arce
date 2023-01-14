@@ -42,7 +42,7 @@ pub fn insert_picture(conn: &Connection, p: Picture) -> Result<PathBuf, err::Err
 
 pub fn insert_photography_picture(
     conn: &Connection,
-    p: PhotographyPicture,
+    p: &mut PhotographyPicture,
 ) -> Result<PathBuf, err::Error> {
     let mut stmt = conn.prepare(
         "SELECT * FROM pictures WHERE\
@@ -82,7 +82,7 @@ pub fn insert_photography_picture(
         p.direction,
         p.article_link
     ])?;
-    Ok(p.path)
+    Ok(p.path.clone())
 }
 
 pub fn get_photography_pictures(conn: &Connection) -> Result<PPictureList, err::Error> {

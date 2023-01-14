@@ -10,7 +10,7 @@ pub struct GlobalConfig {
 
     pub pic_cloud_prefix: String,
     pub pic_local: PathBuf,
-    pub pic_compress_threshold: usize,
+    pub pic_compress_threshold: u64,
 
     pub scp_server: String,
     pub scp_pic_path: String,
