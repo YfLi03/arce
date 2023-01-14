@@ -8,7 +8,7 @@ use crate::api::pictures::PPictureList;
 use crate::api::pictures::PhotographyPicture;
 use crate::api::pictures::Picture;
 
-pub fn find_picture(conn: &Connection, p: Picture) -> Result<Option<PathBuf>, err::Error> {
+pub fn find_picture(conn: &Connection, p: &Picture) -> Result<Option<PathBuf>, err::Error> {
     let mut stmt = conn.prepare("SELECT * FROM pictures WHERE HASH = ?1")?;
     let mut rows = stmt.query(params![p.hash])?;
     if let Some(row) = rows.next()? {
@@ -26,18 +26,8 @@ pub fn find_picture(conn: &Connection, p: Picture) -> Result<Option<PathBuf>, er
 }
 
 pub fn insert_picture(conn: &Connection, p: Picture) -> Result<PathBuf, err::Error> {
-    let mut stmt = conn.prepare("SELECT * FROM pictures WHERE HASH = ?1")?;
-    let mut rows = stmt.query(params![p.hash])?;
-    if let Some(row) = rows.next()? {
-        return Ok(PathBuf::from(row.get::<&str, String>("PATH")?));
-    };
-
-    if let Some(ref hash) = p.hash_old {
-        let mut stmt = conn.prepare("SELECT * FROM pictures WHERE HASH_OLD = ?1")?;
-        let mut rows = stmt.query(params![hash])?;
-        if let Some(row) = rows.next()? {
-            return Ok(PathBuf::from(row.get::<&str, String>("PATH")?));
-        };
+    if let Some(path) = find_picture(conn, &p)? {
+        return Ok(path);
     }
 
     let mut stmt = conn.prepare(
@@ -76,8 +66,8 @@ pub fn insert_photography_picture(
 
     let mut stmt = conn.prepare(
         "INSERT INTO pictures\
-    (PATH, HASH, PHOTOGRAPHY, HASH_OLD, SELECTED, TITLE, PARAMS, DATE, CAMERA, ARTICLE)\
-    VALUES (?1, ?2, true, ?3, ?4. ?5, ?6, ?7, ?8, ?9)\
+    (PATH, HASH, PHOTOGRAPHY, HASH_OLD, SELECTED, TITLE, PARAMS, DATE, CAMERA, DIRECTION, ARTICLE)\
+    VALUES (?1, ?2, true, ?3, ?4. ?5, ?6, ?7, ?8, ?9, ?10)\
     ",
     )?;
     stmt.execute(params![
@@ -89,6 +79,7 @@ pub fn insert_photography_picture(
         p.params,
         p.date,
         p.camera,
+        p.direction,
         p.article_link
     ])?;
     Ok(p.path)
@@ -109,6 +100,7 @@ pub fn get_photography_pictures(conn: &Connection) -> Result<PPictureList, err::
             params: row.get("PARAMS")?,
             date: row.get("DATE")?,
             camera: row.get("CAMERA")?,
+            direction: row.get("DIRECTION")?,
             article_link: row.get("ARTICLE_LINK")?,
         })
     }
@@ -128,6 +120,7 @@ pub fn init(conn: &Connection) -> Result<(), err::Error> {
         PARAMS          TEXT,\
         DATE            TEXT,\
         CAMERA          TEXT,\
+        DIRECTION       TEXT,\
         ARTICLE         TEXT\
         ",
         [],

@@ -1,4 +1,6 @@
 use std::collections::HashSet;
+
+use api::config::CONFIG;
 /*
 mod parser;
 mod config;
@@ -12,9 +14,9 @@ mod sql;
 mod api;
 mod model;
 mod notifier;
-mod picture;
 
 fn main() {
+    // CONFIG.set().unwrap();
     /*
     println!("Main Running.");
 

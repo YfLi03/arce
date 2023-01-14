@@ -1,4 +1,6 @@
 use std::path::PathBuf;
+use once_cell::sync::OnceCell;
+use crate::api::err;
 
 pub struct GlobalConfig {
     pub title: String,
@@ -16,4 +18,16 @@ pub struct GlobalConfig {
 
     pub deploy_auto: bool,
     pub deploy_interval: Option<usize>,
+}
+
+pub static CONFIG: OnceCell<GlobalConfig> = OnceCell::new();
+
+impl GlobalConfig {
+    pub fn global() -> &'static GlobalConfig {
+        CONFIG.get().expect("Global Config is not initialized")
+    }
+
+    fn from_file() -> Result<GlobalConfig, err::Error> {
+        unimplemented!()
+    }
 }

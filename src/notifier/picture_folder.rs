@@ -1,6 +1,5 @@
 use crate::api::err;
 use crate::api::folders::{PictureFolder, PictureFolderList};
-use crate::api::pictures::read_info;
 use crate::api::pictures::PhotographyPicture;
 use crate::api::sync::{ConnPool, NeedPublish};
 use notify::event::{CreateKind, ModifyKind, RemoveKind};
@@ -77,14 +76,10 @@ fn search_folder(p: PathBuf) -> Result<(), err::Error> {
                 ),
             )?;
 
-            pic = read_info(pic);
-
-            unimplemented!();
-            // using a sender to send message to
-
-            //  readinfo;
-            //  store;
-            //  registre;
+            pic = pic
+                .read_info()?
+                .process_and_store()?;
+            pic.register_and_upload()?;
         }
     }
     Ok(())
