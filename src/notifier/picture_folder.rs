@@ -12,8 +12,8 @@ use std::thread;
 
 // for articles, notifier use db operations directly
 
-pub fn watch_folders(a_folders: PictureFolderList, pool: ConnPool) {
-    for folder in a_folders {
+pub fn watch_folders(p_folders: PictureFolderList, pool: ConnPool) {
+    for folder in p_folders {
         let pool = pool.clone();
         thread::spawn(|| {
             if let Err(e) = watch_picture_folder(folder, pool) {

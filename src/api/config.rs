@@ -2,6 +2,7 @@ use crate::api::err;
 use once_cell::sync::OnceCell;
 use std::path::PathBuf;
 
+#[derive(Debug)]
 pub struct GlobalConfig {
     pub title: String,
     pub subtitle: String,
@@ -27,7 +28,7 @@ impl GlobalConfig {
         CONFIG.get().expect("Global Config is not initialized")
     }
 
-    fn from_file() -> Result<GlobalConfig, err::Error> {
+    pub fn from_file(f: PathBuf) -> Result<GlobalConfig, err::Error> {
         unimplemented!()
     }
 }

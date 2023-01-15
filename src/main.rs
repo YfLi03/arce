@@ -1,6 +1,6 @@
-use std::collections::HashSet;
+use std::{collections::HashSet, path::PathBuf};
 
-use api::{config::CONFIG, sync::{ConnPool, GlobalConnPool, CONN_POOL}};
+use api::{config::{CONFIG, GlobalConfig}, sync::{ConnPool, GlobalConnPool, CONN_POOL, NeedPublish, NEED_PUBLISH}};
 use r2d2_sqlite::SqliteConnectionManager;
 /*
 mod parser;
@@ -16,23 +16,29 @@ mod api;
 mod model;
 mod notifier;
 
-fn init(){
+fn init(f: PathBuf){
     let manager = SqliteConnectionManager::file("arce.db");
     let global_conn_pool = GlobalConnPool(r2d2::Pool::new(manager).unwrap());
     CONN_POOL.set(global_conn_pool).unwrap();
 
+    let need_publish = NeedPublish::new(false);
+    NEED_PUBLISH.set(need_publish).unwrap();
+
+    let config = GlobalConfig::from_file(f).expect("Reading Config file failed");
+    CONFIG.set(config).unwrap();
+
+    let conn = GlobalConnPool::global().0.get().unwrap();
+    crate::model::init().expect("Initialize DB failed");
     // read config
 
-    // set Need Publish
+    crate::notifier::init().expect("Initialize Article Notifier failed");
 
-    // init db
-
-    // init notifier
 
     // init renderer
 }
 
 fn main() {
+    init();
     // CONFIG.set().unwrap();
     /*
     println!("Main Running.");

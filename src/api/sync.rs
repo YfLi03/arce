@@ -13,17 +13,13 @@ impl GlobalConnPool {
             .get()
             .expect("Global Conn Pool is not initialized")
     }
-
-    fn init() -> Result<GlobalConnPool, err::Error> {
-        unimplemented!();
-    }
 }
 
 pub static CONN_POOL: OnceCell<GlobalConnPool> = OnceCell::new();
 
 
 
-
+#[derive(Debug)]
 pub struct NeedPublish(Mutex<bool>);
 
 pub static NEED_PUBLISH: OnceCell<NeedPublish> = OnceCell::new();
@@ -37,7 +33,7 @@ impl NeedPublish {
         *self.0.lock().unwrap()
     }
 
-    fn new(state: bool) -> Self {
+    pub fn new(state: bool) -> Self {
         NeedPublish(Mutex::new(state))
     }
 
