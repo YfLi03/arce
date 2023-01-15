@@ -9,12 +9,11 @@ use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 use std::thread;
 
-pub fn watch_folders(a_folders: ArticleFolderList, signal: NeedPublish, pool: ConnPool) {
+pub fn watch_folders(a_folders: ArticleFolderList, pool: ConnPool) {
     for folder in a_folders {
         let pool = pool.clone();
-        let signal = signal.clone();
         thread::spawn(|| {
-            if let Err(e) = watch_article_folder(folder, pool, signal) {
+            if let Err(e) = watch_article_folder(folder, pool) {
                 println!("error: {:?}", e);
             }
         });
@@ -24,7 +23,6 @@ pub fn watch_folders(a_folders: ArticleFolderList, signal: NeedPublish, pool: Co
 fn watch_article_folder(
     folder: ArticleFolder,
     pool: ConnPool,
-    signal: NeedPublish,
 ) -> Result<(), err::Error> {
     let (tx, rx) = std::sync::mpsc::channel();
 
@@ -54,6 +52,7 @@ fn watch_article_folder(
             _ => {}
         }
 
+        let signal = NeedPublish::global();
         signal.set(true);
     }
 

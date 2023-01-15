@@ -12,12 +12,11 @@ use std::thread;
 
 // for articles, notifier use db operations directly
 
-pub fn watch_folders(a_folders: PictureFolderList, signal: NeedPublish, pool: ConnPool) {
+pub fn watch_folders(a_folders: PictureFolderList, pool: ConnPool) {
     for folder in a_folders {
         let pool = pool.clone();
-        let signal = signal.clone();
         thread::spawn(|| {
-            if let Err(e) = watch_picture_folder(folder, pool, signal) {
+            if let Err(e) = watch_picture_folder(folder, pool) {
                 println!("error: {:?}", e);
             }
         });
@@ -27,7 +26,6 @@ pub fn watch_folders(a_folders: PictureFolderList, signal: NeedPublish, pool: Co
 fn watch_picture_folder(
     folder: PictureFolder,
     pool: ConnPool,
-    signal: NeedPublish,
 ) -> Result<(), err::Error> {
     let (tx, rx) = std::sync::mpsc::channel();
 
@@ -50,6 +48,7 @@ fn watch_picture_folder(
             _ => {}
         }
 
+        let signal = NeedPublish::global();
         signal.set(true);
     }
 
@@ -76,9 +75,7 @@ fn search_folder(p: PathBuf) -> Result<(), err::Error> {
                 ),
             )?;
 
-            pic = pic
-                .read_info()?
-                .process_and_store()?;
+            pic = pic.read_info()?.process_and_store()?;
             pic.register_and_upload()?;
         }
     }

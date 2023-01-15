@@ -1,6 +1,6 @@
-use std::path::PathBuf;
-use once_cell::sync::OnceCell;
 use crate::api::err;
+use once_cell::sync::OnceCell;
+use std::path::PathBuf;
 
 pub struct GlobalConfig {
     pub title: String,

@@ -1,16 +1,17 @@
-use std::sync::{Arc, Mutex};
 use crate::api::err;
 use once_cell::sync::OnceCell;
+use std::sync::{Arc, Mutex};
 
-#[derive(Clone)]
 
-pub struct NeedPublish(Arc<Mutex<bool>>);
 pub type ConnPool = r2d2::Pool<r2d2_sqlite::SqliteConnectionManager>;
+#[derive(Debug)]
 pub struct GlobalConnPool(pub ConnPool);
 
-impl GlobalConnPool{
+impl GlobalConnPool {
     pub fn global() -> &'static GlobalConnPool {
-        CONN_POOL.get().expect("Global Conn Pool is not initialized")
+        CONN_POOL
+            .get()
+            .expect("Global Conn Pool is not initialized")
     }
 
     fn init() -> Result<GlobalConnPool, err::Error> {
@@ -20,6 +21,12 @@ impl GlobalConnPool{
 
 pub static CONN_POOL: OnceCell<GlobalConnPool> = OnceCell::new();
 
+
+
+
+pub struct NeedPublish(Mutex<bool>);
+
+pub static NEED_PUBLISH: OnceCell<NeedPublish> = OnceCell::new();
 
 impl NeedPublish {
     pub fn set(&self, state: bool) {
@@ -31,6 +38,10 @@ impl NeedPublish {
     }
 
     fn new(state: bool) -> Self {
-        NeedPublish(Arc::new(Mutex::new(state)))
+        NeedPublish(Mutex::new(state))
+    }
+
+    pub fn global() -> &'static NeedPublish {
+        NEED_PUBLISH.get().expect("Error Getting Need Publish Var")
     }
 }

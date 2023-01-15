@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 
-use api::config::CONFIG;
+use api::{config::CONFIG, sync::{ConnPool, GlobalConnPool, CONN_POOL}};
+use r2d2_sqlite::SqliteConnectionManager;
 /*
 mod parser;
 mod config;
@@ -14,6 +15,22 @@ mod sql;
 mod api;
 mod model;
 mod notifier;
+
+fn init(){
+    let manager = SqliteConnectionManager::file("arce.db");
+    let global_conn_pool = GlobalConnPool(r2d2::Pool::new(manager).unwrap());
+    CONN_POOL.set(global_conn_pool).unwrap();
+
+    // read config
+
+    // set Need Publish
+
+    // init db
+
+    // init notifier
+
+    // init renderer
+}
 
 fn main() {
     // CONFIG.set().unwrap();

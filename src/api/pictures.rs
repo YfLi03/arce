@@ -1,15 +1,13 @@
-use std::path::PathBuf;
 use exif::{In, Tag};
 use imagesize::size;
 use log::{info, warn};
+use std::path::PathBuf;
 use std::process::Command;
 
-use crate::api::err;
 use crate::api::config::GlobalConfig;
+use crate::api::err;
 use crate::api::sync::GlobalConnPool;
 use crate::model::pictures::insert_photography_picture;
-
-
 
 pub type PPictureList = Vec<PhotographyPicture>;
 
@@ -70,9 +68,8 @@ impl From<PhotographyPicture> for Picture {
     }
 }
 
-impl PhotographyPicture{
-    pub fn read_info(mut self) -> Result<Self, err::Error>{
-        
+impl PhotographyPicture {
+    pub fn read_info(mut self) -> Result<Self, err::Error> {
         //height and width are not stored in exif.
         match size(&self.path) {
             Ok(r) => {
@@ -85,13 +82,13 @@ impl PhotographyPicture{
                 if r.width < r.height {
                     self.direction = "Portrait".to_string();
                 }
-            },
+            }
             Err(err) => {
                 warn!("size information for pic {:?} not found", self.path);
                 return Ok(self);
             }
         };
-        
+
         let mut file = std::fs::File::open(&self.path)?;
         let mut bufreader = std::io::BufReader::new(&file);
         let exifreader = exif::Reader::new();
@@ -120,7 +117,7 @@ impl PhotographyPicture{
         }
         if let Some(field) = exif.get_field(Tag::FNumber, In::PRIMARY) {
             parameters += &field.display_value().with_unit(&exif).to_string();
-            parameters +=  "  ";
+            parameters += "  ";
         }
         if let Some(field) = exif.get_field(Tag::PhotographicSensitivity, In::PRIMARY) {
             parameters += "iso";
@@ -128,7 +125,7 @@ impl PhotographyPicture{
         }
         if let Some(field) = exif.get_field(Tag::Model, In::PRIMARY) {
             camera += &field.display_value().to_string();
-            camera = camera.replacen("\"","",2);
+            camera = camera.replacen("\"", "", 2);
         };
 
         self.params = parameters;
@@ -138,12 +135,14 @@ impl PhotographyPicture{
         Ok(self)
     }
 
-    pub fn process_and_store(mut self) -> Result<Self, err::Error>{
+    pub fn process_and_store(mut self) -> Result<Self, err::Error> {
         let config = GlobalConfig::global();
         let size = std::fs::metadata(&self.path)?.len();
         if size < config.pic_compress_threshold {
             self.calc_hash()?;
-            let to = config.pic_local.join(self.hash.clone() + self.path.clone().extension().unwrap().to_str().unwrap());
+            let to = config
+                .pic_local
+                .join(self.hash.clone() + self.path.clone().extension().unwrap().to_str().unwrap());
             std::fs::copy(self.path, &to)?;
             self.path = to;
             return Ok(self);
@@ -152,16 +151,20 @@ impl PhotographyPicture{
         info!("Compressing image {:?}", &self.path);
         let mut image = image::io::Reader::open(&self.path)?.decode()?;
         let filter = image::imageops::FilterType::Nearest;
-        image = image.resize(1920,1920,filter);
+        image = image.resize(1920, 1920, filter);
 
         let hash = sha256::digest(image.as_bytes());
-        let save= config.pic_local.join(hash + self.path.clone().extension().unwrap().to_str().unwrap());
+        let save = config
+            .pic_local
+            .join(hash + self.path.clone().extension().unwrap().to_str().unwrap());
         image.save(&save)?;
         self.path = save.clone();
         self.hash_old = Some(self.hash.clone());
         self.calc_hash()?;
 
-        let to = config.pic_local.join(self.hash.clone() + self.path.clone().extension().unwrap().to_str().unwrap());
+        let to = config
+            .pic_local
+            .join(self.hash.clone() + self.path.clone().extension().unwrap().to_str().unwrap());
         std::fs::rename(save, &to)?;
         self.path = to;
 
@@ -169,20 +172,21 @@ impl PhotographyPicture{
     }
 
     pub fn register_and_upload(&mut self) -> Result<(), err::Error> {
-        let config= GlobalConfig::global();
+        let config = GlobalConfig::global();
         let conn = GlobalConnPool::global().0.get()?;
         insert_photography_picture(&conn, self);
 
-        let dst = config.scp_server.clone() + ":" + &config.scp_pic_path + "/" + self.path.file_name().unwrap().to_str().unwrap();
-        match Command::new("scp").arg(&self.path).arg(&dst).output(){
+        let dst = config.scp_server.clone()
+            + ":"
+            + &config.scp_pic_path
+            + "/"
+            + self.path.file_name().unwrap().to_str().unwrap();
+        match Command::new("scp").arg(&self.path).arg(&dst).output() {
             Err(e) => {
-                warn!("Upload of picture {:?} to {:?} failed.",&self.path, &dst);
-            },
-            _=>{}
+                warn!("Upload of picture {:?} to {:?} failed.", &self.path, &dst);
+            }
+            _ => {}
         };
         Ok(())
-
-    
     }
 }
-

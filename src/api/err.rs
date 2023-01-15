@@ -19,7 +19,7 @@ impl Display for Reason {
             Reason::Config => "config.yaml Error",
             Reason::Internet => "SSH Error",
             Reason::Internal => "Tera or other Crates Error",
-            Reason::PictureProcess => "Error Processing the Image"
+            Reason::PictureProcess => "Error Processing the Image",
         };
         write!(f, "{}", s)
     }
@@ -76,7 +76,7 @@ impl From<image::ImageError> for Error {
     fn from(err: image::ImageError) -> Self {
         Error {
             reason: Reason::PictureProcess,
-            message: err.to_string()
+            message: err.to_string(),
         }
     }
 }
@@ -85,7 +85,7 @@ impl From<r2d2::Error> for Error {
     fn from(err: r2d2::Error) -> Self {
         Error {
             reason: Reason::Database,
-            message: err.to_string()
+            message: err.to_string(),
         }
     }
 }
