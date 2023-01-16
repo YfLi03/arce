@@ -339,6 +339,7 @@ notify
 
 ## TO Check
 1. hash 和 文件名有无关联
+2. 增加不严格的 markdown 格式转化
 
 
 

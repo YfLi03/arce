@@ -1,17 +1,18 @@
 use exif::{In, Tag};
 use imagesize::size;
 use log::{info, warn};
+use serde::Serialize;
 use std::path::PathBuf;
 use std::process::Command;
 
 use crate::api::config::GlobalConfig;
 use crate::api::err;
 use crate::api::sync::GlobalConnPool;
-use crate::model::pictures::insert_photography_picture;
+use crate::model::pictures::{insert_photography_picture, insert_picture};
 
 pub type PPictureList = Vec<PhotographyPicture>;
 
-#[derive(Default)]
+#[derive(Default, Clone, Serialize)]
 pub struct PhotographyPicture {
     pub hash_old: Option<String>,
     pub hash: String,
@@ -56,6 +57,39 @@ pub struct Picture {
     pub hash_old: Option<String>,
     pub hash: String,
     pub path: PathBuf,
+}
+impl Picture{
+    pub fn from_dir(p: PathBuf) -> Result<Self, err::Error> {
+        let bytes = std::fs::read(&p)?;
+        let hash = sha256::digest(&*bytes);
+        Ok(Picture { hash_old: None, hash , path: p })
+    }
+
+    // both storing, registering and uploading
+    pub fn register(mut self) -> Result<PathBuf, err::Error> {
+        let config = GlobalConfig::global();
+        let conn = GlobalConnPool::global().0.get().unwrap();
+        let to = config.pic_local.join(self.hash.clone() + self.path.clone().extension().unwrap().to_str().unwrap());
+        std::fs::copy(&self.path, &to)?;
+        self.path = to;
+
+        let path = insert_picture(&conn, &self)?;
+        self.path = path;
+
+        let dst = config.scp_server.clone()
+            + ":"
+            + &config.scp_pic_path
+            + "/"
+            + self.path.clone().file_name().unwrap().to_str().unwrap();
+        match Command::new("scp").arg(&self.path).arg(&dst).output() {
+            Err(e) => {
+                warn!("Upload of picture {:?} to {:?} failed.", &self.path, &dst);
+            }
+            _ => {}
+        }; 
+        Ok(self.path)    
+    }
+
 }
 
 impl From<PhotographyPicture> for Picture {
@@ -193,6 +227,7 @@ impl PhotographyPicture {
 
 
 /// struct used for tera rendering
+#[derive(Serialize)]
 pub struct PhotographyPictureBrief {
     pub selected: bool,
     pub title: String,

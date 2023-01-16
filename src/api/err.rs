@@ -4,6 +4,7 @@ use std::fmt::{self, Display};
 #[derive(Clone, Debug, Serialize)]
 pub enum Reason {
     Database,
+    ArticleRender,
     Filesystem,
     PictureProcess,
     Config,
@@ -20,6 +21,7 @@ impl Display for Reason {
             Reason::Internet => "SSH Error",
             Reason::Internal => "Tera or other Crates Error",
             Reason::PictureProcess => "Error Processing the Image",
+            Reason::ArticleRender => "Error Rendering Markdown to HTML"
         };
         write!(f, "{}", s)
     }

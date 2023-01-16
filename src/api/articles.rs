@@ -2,6 +2,8 @@ use std::fs::read_to_string;
 use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use serde::{Deserialize, Serialize};
+
 use crate::api::err;
 
 pub type ArticleList = Vec<ArticleInfo>;
@@ -27,6 +29,7 @@ impl From<(PathBuf, String)> for ArticleInfo {
 }
 
 /// full article including contents
+#[derive(Default, Serialize, Clone)]
 pub struct Article {
     pub title: String,
     pub date: String,
@@ -37,8 +40,18 @@ pub struct Article {
     pub content: String
 }
 
-
+#[derive(Deserialize)]
+pub struct ArticleYaml {
+    pub title: String,
+    pub path: Option<String>,
+    pub date: String,
+    pub category: Option<String>,
+    pub headline: Option<bool>,
+    pub summary: Option<String>
+}
+/* 
 // use as headline info
+#[derive(Serialize)]
 pub struct ArticleBrief {
     pub title: String,
     pub date: String,
@@ -56,7 +69,8 @@ impl From<Article> for ArticleBrief{
         }
     }
 }
-
+*/
+#[derive(Serialize)]
 pub struct CategoryBrief{
     pub title: String,
     pub summary: String,

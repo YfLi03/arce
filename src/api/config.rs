@@ -1,10 +1,10 @@
 use crate::api::err;
 use log::info;
 use once_cell::sync::OnceCell;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct GlobalConfig {
     pub title: String,
     pub subtitle: String,
@@ -14,6 +14,7 @@ pub struct GlobalConfig {
     pub pic_cloud_prefix: String,
     pub pic_local: PathBuf,
     pub pic_compress_threshold: u64,
+    pub pic_replace_prefix: String,
 
     pub scp_server: String,
     pub scp_pic_path: String,

@@ -25,7 +25,7 @@ pub fn find_picture(conn: &Connection, p: &Picture) -> Result<Option<PathBuf>, e
     Ok(None)
 }
 
-pub fn insert_picture(conn: &Connection, p: Picture) -> Result<PathBuf, err::Error> {
+pub fn insert_picture(conn: &Connection, p: &Picture) -> Result<PathBuf, err::Error> {
     if let Some(path) = find_picture(conn, &p)? {
         return Ok(path);
     }
@@ -37,7 +37,7 @@ pub fn insert_picture(conn: &Connection, p: Picture) -> Result<PathBuf, err::Err
     ",
     )?;
     stmt.execute(params![p.path.to_str(), p.hash, p.hash_old])?;
-    Ok(p.path)
+    Ok(p.path.clone())
 }
 
 pub fn insert_photography_picture(

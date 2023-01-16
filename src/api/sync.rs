@@ -1,6 +1,5 @@
-use crate::api::err;
 use once_cell::sync::OnceCell;
-use std::sync::{Arc, Mutex};
+use std::sync::Mutex;
 
 
 pub type ConnPool = r2d2::Pool<r2d2_sqlite::SqliteConnectionManager>;

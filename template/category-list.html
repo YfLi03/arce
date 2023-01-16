@@ -10,10 +10,9 @@
     <div class="row px-3">
         <div class="col-0 col-lg-2"></div>
             <div class="col-12 col-lg-8">
-                {% for item in items %}
-                <a rel="noopener" href="{{item.url}}" style="color:black;" class="font-header">
-                    <h2>{{item.title}}</h2>
-                    <p>{{item.summary}}</p>
+                {% for category in categories %}
+                <a rel="noopener" href="{{category.url}}" style="color:black;" class="font-header">
+                    <h2>{{category.title}}</h2>
                 </a>
                 <hr>
                 {% endfor %}

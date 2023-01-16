@@ -6,7 +6,7 @@ use crate::model::articles::{delete_article, update_article};
 use notify::event::{CreateKind, ModifyKind, RemoveKind};
 use notify::{Config, EventKind, RecommendedWatcher, RecursiveMode, Watcher};
 use std::ffi::OsString;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::thread;
 
 pub fn watch_folders(a_folders: ArticleFolderList, pool: ConnPool) {

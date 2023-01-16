@@ -2,12 +2,12 @@ use crate::api::err;
 use crate::api::folders::{PictureFolder, PictureFolderList};
 use crate::api::pictures::PhotographyPicture;
 use crate::api::sync::{ConnPool, NeedPublish};
-use notify::event::{CreateKind, ModifyKind, RemoveKind};
+use notify::event::CreateKind;
 use notify::{Config, EventKind, RecommendedWatcher, RecursiveMode, Watcher};
 use regex::Regex;
-use std::ffi::{OsStr, OsString};
+use std::ffi::OsStr;
 use std::fs::{read_to_string, DirEntry};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::thread;
 
 // for articles, notifier use db operations directly
