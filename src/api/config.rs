@@ -1,8 +1,10 @@
 use crate::api::err;
+use log::info;
 use once_cell::sync::OnceCell;
+use serde::Deserialize;
 use std::path::PathBuf;
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize)]
 pub struct GlobalConfig {
     pub title: String,
     pub subtitle: String,
@@ -18,7 +20,7 @@ pub struct GlobalConfig {
     pub scp_web_path: String,
 
     pub deploy_auto: bool,
-    pub deploy_interval: Option<usize>,
+    pub deploy_interval: Option<u64>,
 }
 
 pub static CONFIG: OnceCell<GlobalConfig> = OnceCell::new();
@@ -29,6 +31,9 @@ impl GlobalConfig {
     }
 
     pub fn from_file(f: PathBuf) -> Result<GlobalConfig, err::Error> {
-        unimplemented!()
+        let yaml = std::fs::File::open(f)?;
+        let config: GlobalConfig = serde_yaml::from_reader(yaml)?;
+        info!("CONFIG READ {:?}", &config);
+        Ok(config)
     }
 }

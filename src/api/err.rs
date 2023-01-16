@@ -89,3 +89,12 @@ impl From<r2d2::Error> for Error {
         }
     }
 }
+
+impl From<serde_yaml::Error> for Error {
+    fn from(err: serde_yaml::Error) -> Self {
+        Error{
+            reason: Reason::Internal,
+            message: err.to_string(),
+        }
+    }
+}

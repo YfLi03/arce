@@ -1,26 +1,23 @@
-use std::{collections::HashSet, path::PathBuf};
-
+use std::{collections::HashSet, path::PathBuf, thread::{self, Thread}};
+use clap::{ArgAction, Parser};
 use api::{config::{CONFIG, GlobalConfig}, sync::{ConnPool, GlobalConnPool, CONN_POOL, NeedPublish, NEED_PUBLISH}};
 use r2d2_sqlite::SqliteConnectionManager;
-/*
-mod parser;
-mod config;
-mod pic_selector;
-mod renderer;
-mod markdown;
-mod init;
-mod article;
-mod sql;
-*/
+
 mod api;
 mod model;
 mod notifier;
+mod publisher;
 
-fn arg_parse() {
-    
+#[derive(Debug, Parser)]
+struct Args {
+    #[clap(short='c', long = "config", value_parser)]
+    config_file: Option<String>
 }
 
-fn init(f: PathBuf){
+fn init(){
+    let args : Args = Args::parse();
+    let f = PathBuf::from(args.config_file.unwrap_or(String::from("config.yaml")));
+
     let manager = SqliteConnectionManager::file("arce.db");
     let global_conn_pool = GlobalConnPool(r2d2::Pool::new(manager).unwrap());
     CONN_POOL.set(global_conn_pool).unwrap();
@@ -35,33 +32,14 @@ fn init(f: PathBuf){
 
     crate::notifier::init().expect("Initialize Article Notifier failed");
 
+    crate::publisher::start();
 
     // init renderer
 }
 
 fn main() {
     init();
-    // CONFIG.set().unwrap();
-    /*
-    println!("Main Running.");
+    while true {
 
-    init::init_public_folder().expect("Error initializing the folders");
-
-    let web = parser::parse().expect("Error loading templates for tera");
-
-    let config_info =  config::read().expect("Error reading the config");
-
-    //Render the articles and also get their names
-    let mut name_set: HashSet<String> = HashSet::new();
-    let articles = article::read(&mut name_set);
-
-    let pic_list = pic_selector::read(&config_info,&name_set).unwrap();
-
-    renderer::render_main(&web, &config_info, &pic_list, &articles);
-    println!("Main completed.");
-
-    println!("Press any key and Enter to continue...");
-    let mut temp = String::new();
-    std::io::stdin().read_line(&mut temp).expect("Failed to read line");
-    */
+    }
 }
