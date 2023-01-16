@@ -1,3 +1,4 @@
+use log::warn;
 use serde::Serialize;
 use std::fmt::{self, Display};
 
@@ -49,6 +50,7 @@ impl Error {
 
 impl From<rusqlite::Error> for Error {
     fn from(err: rusqlite::Error) -> Self {
+        warn!("{:?}", err);
         Error {
             reason: Reason::Database,
             message: err.to_string(),
@@ -58,6 +60,7 @@ impl From<rusqlite::Error> for Error {
 
 impl From<std::io::Error> for Error {
     fn from(err: std::io::Error) -> Self {
+        warn!("{:?}", err);
         Error {
             reason: Reason::Internal,
             message: err.to_string(),
@@ -67,6 +70,7 @@ impl From<std::io::Error> for Error {
 
 impl From<notify::Error> for Error {
     fn from(err: notify::Error) -> Self {
+        warn!("{:?}", err);
         Error {
             reason: Reason::Filesystem,
             message: err.to_string(),
@@ -76,6 +80,7 @@ impl From<notify::Error> for Error {
 
 impl From<image::ImageError> for Error {
     fn from(err: image::ImageError) -> Self {
+        warn!("{:?}", err);
         Error {
             reason: Reason::PictureProcess,
             message: err.to_string(),
@@ -85,6 +90,7 @@ impl From<image::ImageError> for Error {
 
 impl From<r2d2::Error> for Error {
     fn from(err: r2d2::Error) -> Self {
+        warn!("{:?}", err);
         Error {
             reason: Reason::Database,
             message: err.to_string(),
@@ -94,6 +100,7 @@ impl From<r2d2::Error> for Error {
 
 impl From<serde_yaml::Error> for Error {
     fn from(err: serde_yaml::Error) -> Self {
+        warn!("{:?}", err);
         Error{
             reason: Reason::Internal,
             message: err.to_string(),

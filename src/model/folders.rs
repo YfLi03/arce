@@ -59,7 +59,7 @@ pub fn init(conn: &Connection) -> Result<(), err::Error> {
         PATH    TEXT        NOT NULL,\
         DEPLOY  TEXT        NOT NULL,\
         CONFIRM BOOLEAN     NOT NULL\
-        ",
+        )",
         [],
     )?;
 
@@ -67,7 +67,7 @@ pub fn init(conn: &Connection) -> Result<(), err::Error> {
         "CREATE TABLE IF NOT EXISTS picture_folders (\
         ID      INTEGER     PRIMARY KEY AUTOINCREMENT,  \
         PATH    TEXT        NOT NULL\
-        ",
+        )",
         [],
     )?;
 

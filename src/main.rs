@@ -1,7 +1,10 @@
-use std::{collections::HashSet, path::PathBuf, thread::{self, Thread}};
+use std::{collections::HashSet, path::PathBuf, thread::{self, Thread}, fs::read_dir};
 use clap::{ArgAction, Parser};
-use api::{config::{CONFIG, GlobalConfig}, sync::{ConnPool, GlobalConnPool, CONN_POOL, NeedPublish, NEED_PUBLISH}};
+use api::{config::{CONFIG, GlobalConfig}, sync::{ConnPool, GlobalConnPool, CONN_POOL, NeedPublish, NEED_PUBLISH}, folders::{ArticleFolder, PictureFolder}};
+use log::info;
+use model::folders::{add_article_folder, add_picture_folder};
 use r2d2_sqlite::SqliteConnectionManager;
+use text_io::read;
 
 mod api;
 mod model;
@@ -15,6 +18,7 @@ struct Args {
 }
 
 fn init(){
+    info!("Initializing");
     let args : Args = Args::parse();
     let f = PathBuf::from(args.config_file.unwrap_or(String::from("config.yaml")));
 
@@ -34,12 +38,44 @@ fn init(){
 
     crate::publisher::start();
 
-    // init renderer
+    NeedPublish::global().set(true);
+
+    info!("Initialized");
 }
 
 fn main() {
-    init();
-    while true {
+    env_logger::init();
 
+    init();
+    loop{
+        let t: i32 = read!();
+        match t {
+            1 => {
+                let conn = GlobalConnPool::global().0.get().unwrap();
+                let path: String = read!();
+                let path = PathBuf::from(path);
+                let deploy: String = read!();
+                let need_confirm: bool = read!();
+                let f = ArticleFolder{
+                    path,
+                    deploy,
+                    need_confirm
+                };
+                add_article_folder(&conn, f).unwrap();
+
+
+            },
+            2 => {
+                let conn = GlobalConnPool::global().0.get().unwrap();
+                let path: String = read!();
+                let path = PathBuf::from(path);
+                let f = PictureFolder{
+                    path
+                };
+                add_picture_folder(&conn, f).unwrap();
+            },
+            _ => {}
+        }
+        
     }
 }

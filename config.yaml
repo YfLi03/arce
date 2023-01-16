@@ -1,6 +1,16 @@
-tab_title: someone's gallery
 title: SOMEONE
 subtitle: vision
-footer_info: someone © 2022
+foot: someone © 2022
 beian: 沪ICP备XXXXXX号
-compress_image: true
+
+pic_cloud_prefix: pic.iceeera.com
+pic_local: /Users/yfli/Code/temp/pic
+pic_compress_threshold: 10000000
+pic_replace_prefix: /Users/yfli
+
+scp_server: tcloud
+scp_pic_path: /web/test/pic
+scp_web_path: /web/test
+
+deploy_auto: true
+deploy_interval: 10

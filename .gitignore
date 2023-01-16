@@ -5,4 +5,4 @@
 /workspace
 pics.json
 .idea
-pics.db
+*.db

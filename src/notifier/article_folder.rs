@@ -3,6 +3,7 @@ use crate::api::err;
 use crate::api::folders::{ArticleFolder, ArticleFolderList};
 use crate::api::sync::{ConnPool, NeedPublish};
 use crate::model::articles::{delete_article, update_article};
+use log::info;
 use notify::event::{CreateKind, ModifyKind, RemoveKind};
 use notify::{Config, EventKind, RecommendedWatcher, RecursiveMode, Watcher};
 use std::ffi::OsString;
@@ -43,6 +44,10 @@ fn watch_article_folder(
                 add_article(event.paths[0].clone(), &folder, &pool)?;
             }
             EventKind::Modify(ModifyKind::Name(_)) => {
+                if event.paths.len() == 1 {
+                    add_article(event.paths[0].clone(), &folder, &pool)?;
+                    continue;
+                }
                 remove_article(event.paths[0].clone(), &pool)?;
                 add_article(event.paths[1].clone(), &folder, &pool)?;
             }

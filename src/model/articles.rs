@@ -37,7 +37,7 @@ pub fn update_article(conn: &Connection, article: ArticleInfo) -> Result<(), err
 
 pub fn delete_article(conn: &Connection, p: PathBuf) -> Result<(), err::Error> {
     let mut stmt = conn.prepare(
-        "DELETE FROM articles\
+        "DELETE FROM articles \
         WHERE PATH = ?1 ",
     )?;
     stmt.execute(params![p.to_str()])?;
@@ -47,11 +47,10 @@ pub fn delete_article(conn: &Connection, p: PathBuf) -> Result<(), err::Error> {
 pub fn init(conn: &Connection) -> Result<(), err::Error> {
     conn.execute(
         "CREATE TABLE IF NOT EXISTS articles (\
-        ID              INTEGER     PRIMARY KEY AUTOINCREMENT,  \
-        PATH            TEXT        NOT NULL,\
+        PATH            TEXT        NOT NULL    PRIMARY KEY,\
         DEPLOY_FOLDER   BOOLEAN     NOT NULL,\
         TIME            INTEGER     NOT NULL\
-        ",
+        )",
         [],
     )?;
 

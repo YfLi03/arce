@@ -8,12 +8,12 @@ use serde_json::map;
 use slug::slugify;
 use tera::{Tera, Context};
 
-use crate::{api::{err, config::{GlobalConfig, self, CONFIG}, articles::{Article, ArticleYaml, ArticleInfo}, pictures::{Picture, PhotographyPicture}, sync::GlobalConnPool}, model::{articles::get_articles, pictures::get_photography_pictures}};
+use crate::{api::{err, config::{GlobalConfig, self, CONFIG}, articles::{Article, ArticleYaml, ArticleInfo}, pictures::{Picture, PhotographyPicture, self, PhotographyPictureBrief}, sync::{GlobalConnPool, NeedPublish}}, model::{articles::get_articles, pictures::get_photography_pictures}};
 
-const FOLDERS: [&str; 6] = 
+const FOLDERS: [&str; 5] = 
     ["public/index", "public/gallery",
     "public/css", "public/picture",
-    "public/category", "public/article"];
+    "public/category"];
 
 #[derive(Serialize, Clone)]
 struct Page{
@@ -23,7 +23,7 @@ struct Page{
 
 impl Page{
     fn new(i: usize, s: String) -> Self {
-        let v = [0,1,2].into_iter().map(|x|{
+        let v = [0,1,2,3].into_iter().map(|x|{
             if i==x {
                 "black".to_string()
             } else {
@@ -65,7 +65,7 @@ struct Category{
 impl Category{
     fn new(s: String) -> Self {
         Category{
-            url: "/category/".to_string() + &slugify(&s) + ".html",
+            url: "category/".to_string() + &slugify(&s) + ".html",
             title: s,
         }
     }
@@ -88,7 +88,8 @@ fn picture_replace(mut content: String) -> Result<String, err::Error> {
         if !cap[2].starts_with(&config.pic_replace_prefix) {continue};
         let p = Picture::from_dir(PathBuf::from(&cap[2]))?;
         let path = p.register()?;
-        content = content.replace(&cap[2], path.to_str().unwrap());
+        let to =  config.pic_cloud_prefix.clone() + "/"+ &path.file_name().unwrap().to_str().unwrap();
+        content = content.replace(&cap[2], &to);
     };
     Ok(content)
 }
@@ -144,6 +145,7 @@ fn process_articles() -> Result<Vec<Article>, err::Error> {
         info!("Handling Article {:?}", &a.path);
         let content = std::fs::read_to_string(a.path)?;
         let mut article = read_article_header(content)?;
+        article.content = picture_replace(article.content)?;
         article = markdown_paser(article)?;
         article.url = String::from("/") + &a.deploy_folder + "/" + &article.url + ".html";
         Ok(article)
@@ -165,6 +167,9 @@ lazy_static!{
 }
 //the main render function
 fn gen_html(context: &Context, template: &str, dst: &str) -> Result<(), err::Error>{
+    let path = PathBuf::from(dst);
+    let prefix = path.parent().unwrap();
+    std::fs::create_dir_all(prefix)?;
 
     let t = TERA.render(template, &context).unwrap();
     let mut f = std::fs::File::create(&dst)?;
@@ -180,14 +185,13 @@ fn index(articles: Vec<Article>) -> Result<(), err::Error> {
     context.insert("global", config);
     context.insert("need_nav", &true);
     context.insert("page", &Page::new(0, "文章 | ".to_string() + &config.title));
-    
     let headlines: Vec<Article>= articles.into_iter().filter(|a|{a.headline}).collect();
     //context.insert("article_briefs", &headlines);
 
-    let page = headlines.len() / 20;
+    let page = (headlines.len()) / 20 + 1;
     
     for i in 1..=page {
-        context.insert("article_briefs", &headlines[(i-1)*20..=min((i)*20-1, headlines.len())]);
+        context.insert("article_briefs", &headlines[(i-1)*20..min((i)*20, headlines.len())]);
         context.insert("nav", &Navigator::new(page, i));
         gen_html(&context, "category.html", &("public/index/".to_string() + &i.to_string() + ".html"))?;
     };
@@ -224,14 +228,14 @@ fn article_category(articles: Vec<Article>) -> Result<(), err::Error> {
     let categories: Vec<Category> = categories.into_iter().map(|c|{Category::new(c)}).collect();
     context.insert("categories", &categories);
 
-    gen_html(&context, "category-list", "public/article_category.html")?;
+    gen_html(&context, "category-list.html", "public/article_category.html")?;
     for c in categories {
             category(c, articles.clone())?;
     };
     Ok(())
 }
 
-fn gallery(mut pictures: Vec<PhotographyPicture>) -> Result<(), err::Error> {
+fn gallery(mut pictures: Vec<PhotographyPictureBrief>) -> Result<(), err::Error> {
     let mut context = Context::new();
     let config = GlobalConfig::global();
     context.insert("global", config);
@@ -239,10 +243,10 @@ fn gallery(mut pictures: Vec<PhotographyPicture>) -> Result<(), err::Error> {
     context.insert("page", &Page::new(1, "照片 | ".to_string() + &config.title));
     pictures = pictures.into_iter().filter(|p| p.selected).collect();
 
-    let page = pictures.len() / 20;
+    let page = (pictures.len()) / 20 + 1;
     
     for i in 1..=page {
-        context.insert("pics", &pictures[(i-1)*20..=min((i)*20-1, pictures.len())]);
+        context.insert("pics", &pictures[(i-1)*20..min((i)*20, pictures.len())]);
         context.insert("nav", &Navigator::new(page, i));
         gen_html(&context, "picture.html", &("public/gallery/".to_string() + &i.to_string() + ".html"))?;
     };
@@ -250,17 +254,17 @@ fn gallery(mut pictures: Vec<PhotographyPicture>) -> Result<(), err::Error> {
     Ok(())
 }
 
-fn picture(pictures: Vec<PhotographyPicture>) -> Result<(), err::Error> {
+fn picture(pictures: Vec<PhotographyPictureBrief>) -> Result<(), err::Error> {
     let mut context = Context::new();
     let config = GlobalConfig::global();
     context.insert("global", config);
     context.insert("need_nav", &true);
     context.insert("page", &Page::new(3, "图库 | ".to_string() + &config.title));
 
-    let page = pictures.len() / 20;
+    let page = (pictures.len()) / 20 + 1;
     
     for i in 1..=page {
-        context.insert("pics", &pictures[(i-1)*20..=min((i)*20-1, pictures.len())]);
+        context.insert("pics", &pictures[(i-1)*20..min((i)*20, pictures.len())]);
         context.insert("nav", &Navigator::new(page, i));
         gen_html(&context, "picture.html", &("public/picture/".to_string() + &i.to_string() + ".html"))?;
     };
@@ -282,6 +286,7 @@ fn article(articles: Vec<Article>) -> Result<(), err::Error>{
 }
 
 fn render() -> Result<(), err::Error> {
+    info!("Rendering");
     let articles = process_articles()?;
     index(articles.clone())?;
     article_category(articles.clone())?;
@@ -289,14 +294,17 @@ fn render() -> Result<(), err::Error> {
     let conn = GlobalConnPool::global().0.get().unwrap();
     let mut pictures = get_photography_pictures(&conn)?;
     pictures.sort_by(|a, b| (&b).date.cmp(&a.date));
+    let pictures: Vec<PhotographyPictureBrief> = pictures.into_iter().map(|p| PhotographyPictureBrief::from(p)).collect();
     gallery(pictures.clone())?;
     picture(pictures.clone())?;
 
     article(articles)?;
+    info!("Rendered");
     Ok(())
 }
 
 fn deploy(){
+    info!("Deploying");
     let config = GlobalConfig::global();
     let dst = config.scp_server.clone()
                         +":"
@@ -307,6 +315,7 @@ fn deploy(){
         },
         _ => {}
     }
+    info!("Deployed");
 }
 
 pub fn start() {
@@ -320,12 +329,15 @@ pub fn start() {
         {
             loop {
                 sleep(Duration::new(config.deploy_interval.unwrap(), 0));
+                let need_publish = NeedPublish::global().get();
+                if !need_publish {continue};
                 info!("Start Publishing");
                 if let Err(e) = render() {
                     warn!("Error rendering , {:?}", e);
                     continue;
                 }
                 deploy();
+                NeedPublish::global().set(false);
             }
         }
     );

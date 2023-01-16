@@ -122,7 +122,7 @@ pub fn init(conn: &Connection) -> Result<(), err::Error> {
         CAMERA          TEXT,\
         DIRECTION       TEXT,\
         ARTICLE         TEXT\
-        ",
+        )",
         [],
     )?;
     Ok(())

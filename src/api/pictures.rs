@@ -208,7 +208,7 @@ impl PhotographyPicture {
     pub fn register_and_upload(&mut self) -> Result<(), err::Error> {
         let config = GlobalConfig::global();
         let conn = GlobalConnPool::global().0.get()?;
-        insert_photography_picture(&conn, self);
+        insert_photography_picture(&conn, self)?;
 
         let dst = config.scp_server.clone()
             + ":"
@@ -227,7 +227,7 @@ impl PhotographyPicture {
 
 
 /// struct used for tera rendering
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct PhotographyPictureBrief {
     pub selected: bool,
     pub title: String,

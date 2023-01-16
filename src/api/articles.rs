@@ -29,7 +29,7 @@ impl From<(PathBuf, String)> for ArticleInfo {
 }
 
 /// full article including contents
-#[derive(Default, Serialize, Clone)]
+#[derive(Default, Serialize, Clone, Debug)]
 pub struct Article {
     pub title: String,
     pub date: String,
