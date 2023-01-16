@@ -16,6 +16,10 @@ mod api;
 mod model;
 mod notifier;
 
+fn arg_parse() {
+    
+}
+
 fn init(f: PathBuf){
     let manager = SqliteConnectionManager::file("arce.db");
     let global_conn_pool = GlobalConnPool(r2d2::Pool::new(manager).unwrap());
@@ -27,9 +31,7 @@ fn init(f: PathBuf){
     let config = GlobalConfig::from_file(f).expect("Reading Config file failed");
     CONFIG.set(config).unwrap();
 
-    let conn = GlobalConnPool::global().0.get().unwrap();
     crate::model::init().expect("Initialize DB failed");
-    // read config
 
     crate::notifier::init().expect("Initialize Article Notifier failed");
 

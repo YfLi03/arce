@@ -8,11 +8,11 @@
     <!--The header is no longer seprated-->
     {% include "partial/header.html" %}
 
-    {% for item in items %}
-    {% if item.selected %}
+    {% for pic in selected_pics %}
         {% include "partial/pic.html" %}
-    {% endif %}
     {% endfor %}
+
+    {% include "partial/navigator.html" %}   
 
     {% include "partial/footer.html" %}
   </div>

@@ -190,3 +190,34 @@ impl PhotographyPicture {
         Ok(())
     }
 }
+
+
+/// struct used for tera rendering
+pub struct PhotographyPictureBrief {
+    pub selected: bool,
+    pub title: String,
+    pub linked: bool,
+    pub article_link: String,
+    pub url: String,
+
+    pub params: String,
+    pub date: String,
+    pub camera: String,
+    pub direction: String,
+}
+
+impl From<PhotographyPicture> for PhotographyPictureBrief{
+    fn from(p: PhotographyPicture) -> Self {
+        PhotographyPictureBrief {
+            selected: p.selected,
+            title: p.title,
+            linked: !(p.article_link == None),
+            article_link: p.article_link.unwrap_or(String::new()),
+            url: p.path.file_name().unwrap().to_str().unwrap().to_string(),
+            params: p.params,
+            date: p.date,
+            camera: p.camera,
+            direction: p.direction
+        }
+    }
+}

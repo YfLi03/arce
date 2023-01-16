@@ -2,19 +2,30 @@
 
 主页 摄影 文章 图库 
 
-主页：精选文章，分页。home
+
+
+主页：精选文章，分页。index
+index/1.html
 
 摄影：精选照片，分页。gallery
+gallery/1.html
 
 文章：类别，不分页。 article
+article-categories.html
 
 图库：所有照片，分页。 picture
+picture/1.html
 
 
 
 类别页
+category/xxx.html
 
 About 页
+about.html
+
+文章页
+article/xxx.html
 
 
 

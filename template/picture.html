@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+    {% include "partial/head.html" %}
+
+<body>
+<div class="container-fluid bg-light pt-0 pb-3 px-0">
+    {% include "partial/header.html" %}
+
+    {% for item in items %}
+        {% include "partial/pic.html" %}
+    {% endfor %}
+
+    
+    {% include "partial/navigator.html" %}   
+
+    {% include "partial/footer.html" %}   
+  </div>
+
+  
+
