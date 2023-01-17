@@ -2,7 +2,7 @@ use crate::api::err;
 use crate::api::folders::{PictureFolder, PictureFolderList};
 use crate::api::pictures::PhotographyPicture;
 use crate::api::sync::{ConnPool, NeedPublish};
-use log::{info, debug};
+use log::{debug, info};
 use notify::event::CreateKind;
 use notify::{Config, EventKind, RecommendedWatcher, RecursiveMode, Watcher};
 use regex::Regex;
@@ -24,10 +24,7 @@ pub fn watch_folders(p_folders: PictureFolderList, pool: ConnPool) {
     }
 }
 
-fn watch_picture_folder(
-    folder: PictureFolder,
-    pool: ConnPool,
-) -> Result<(), err::Error> {
+fn watch_picture_folder(folder: PictureFolder, pool: ConnPool) -> Result<(), err::Error> {
     info!("Watching Picture Folder {:?}", folder);
     let (tx, rx) = std::sync::mpsc::channel();
 
@@ -43,7 +40,7 @@ fn watch_picture_folder(
 
         match event.kind {
             EventKind::Create(CreateKind::File) => {
-                if is_deploy_file(&event.paths[0]) && find_deploy_flag(&event.paths[0])?{
+                if is_deploy_file(&event.paths[0]) && find_deploy_flag(&event.paths[0])? {
                     let path = event.paths[0].ancestors().next().unwrap().parent().unwrap();
                     search_folder(path.to_path_buf())?;
                 } else {
@@ -51,14 +48,16 @@ fn watch_picture_folder(
                 }
             }
             EventKind::Modify(_) => {
-                if is_deploy_file(&event.paths[0]) && find_deploy_flag(&event.paths[0])?{
+                if is_deploy_file(&event.paths[0]) && find_deploy_flag(&event.paths[0])? {
                     let path = event.paths[0].ancestors().next().unwrap().parent().unwrap();
                     search_folder(path.to_path_buf())?;
                 } else {
                     continue;
                 }
             }
-            _ => {continue;}
+            _ => {
+                continue;
+            }
         }
 
         let signal = NeedPublish::global();
@@ -93,7 +92,9 @@ fn search_folder(p: PathBuf) -> Result<(), err::Error> {
 
             info!("Getting Pic {:?}", pic);
 
-            if pic.is_registered()? {continue;}
+            if pic.is_registered()? {
+                continue;
+            }
 
             pic = pic.read_info()?.process_and_store()?;
             pic.register_and_upload()?;
@@ -104,9 +105,15 @@ fn search_folder(p: PathBuf) -> Result<(), err::Error> {
 
 // TODO: may have some bugs here
 fn is_pic(p: &PathBuf) -> bool {
-    debug!("The Extension is {:?}", &p.extension().unwrap_or(OsStr::new("")).to_str().unwrap());
-    debug!("{:?}",vec!["jpg", "jpeg", "png", "JPG", "PNG", "JPEG"]
-    .contains(&p.extension().unwrap_or(OsStr::new("")).to_str().unwrap()));
+    debug!(
+        "The Extension is {:?}",
+        &p.extension().unwrap_or(OsStr::new("")).to_str().unwrap()
+    );
+    debug!(
+        "{:?}",
+        vec!["jpg", "jpeg", "png", "JPG", "PNG", "JPEG"]
+            .contains(&p.extension().unwrap_or(OsStr::new("")).to_str().unwrap())
+    );
     p.is_file()
         && vec!["jpg", "jpeg", "png", "JPG", "PNG", "JPEG"]
             .contains(&p.extension().unwrap_or(OsStr::new("")).to_str().unwrap())

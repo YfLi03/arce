@@ -54,8 +54,7 @@ pub fn init(conn: &Connection) -> Result<(), err::Error> {
         )",
         [],
     )?;
-    conn.execute(
-        "DELETE FROM articles", [])?;
+    conn.execute("DELETE FROM articles", [])?;
 
     Ok(())
 }

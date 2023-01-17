@@ -37,7 +37,7 @@ pub struct Article {
     pub url: String,
     pub category: String,
     pub headline: bool,
-    pub content: String
+    pub content: String,
 }
 
 #[derive(Deserialize)]
@@ -47,9 +47,9 @@ pub struct ArticleYaml {
     pub date: String,
     pub category: Option<String>,
     pub headline: Option<bool>,
-    pub summary: Option<String>
+    pub summary: Option<String>,
 }
-/* 
+/*
 // use as headline info
 #[derive(Serialize)]
 pub struct ArticleBrief {
@@ -71,10 +71,10 @@ impl From<Article> for ArticleBrief{
 }
 */
 #[derive(Serialize)]
-pub struct CategoryBrief{
+pub struct CategoryBrief {
     pub title: String,
     pub summary: String,
-    pub url: String
+    pub url: String,
 }
 
 pub fn find_deploy_flag(path: &PathBuf) -> Result<bool, err::Error> {

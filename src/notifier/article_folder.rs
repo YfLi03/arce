@@ -21,10 +21,7 @@ pub fn watch_folders(a_folders: ArticleFolderList, pool: ConnPool) {
     }
 }
 
-fn watch_article_folder(
-    folder: ArticleFolder,
-    pool: ConnPool,
-) -> Result<(), err::Error> {
+fn watch_article_folder(folder: ArticleFolder, pool: ConnPool) -> Result<(), err::Error> {
     info!("Initing Article Folder {:?}", &folder);
     let (tx, rx) = std::sync::mpsc::channel();
     let files = folder.path.read_dir()?;

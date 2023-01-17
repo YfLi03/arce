@@ -1,9 +1,18 @@
-use std::{collections::HashSet, path::PathBuf, thread::{self, Thread}, fs::read_dir};
+use api::{
+    config::{GlobalConfig, CONFIG},
+    folders::{ArticleFolder, PictureFolder},
+    sync::{ConnPool, GlobalConnPool, NeedPublish, CONN_POOL, NEED_PUBLISH},
+};
 use clap::{ArgAction, Parser};
-use api::{config::{CONFIG, GlobalConfig}, sync::{ConnPool, GlobalConnPool, CONN_POOL, NeedPublish, NEED_PUBLISH}, folders::{ArticleFolder, PictureFolder}};
 use log::info;
 use model::folders::{add_article_folder, add_picture_folder};
 use r2d2_sqlite::SqliteConnectionManager;
+use std::{
+    collections::HashSet,
+    fs::read_dir,
+    path::PathBuf,
+    thread::{self, Thread},
+};
 use text_io::read;
 
 mod api;
@@ -13,13 +22,13 @@ mod publisher;
 
 #[derive(Debug, Parser)]
 struct Args {
-    #[clap(short='c', long = "config", value_parser)]
-    config_file: Option<String>
+    #[clap(short = 'c', long = "config", value_parser)]
+    config_file: Option<String>,
 }
 
-fn init(){
+fn init() {
     info!("Initializing");
-    let args : Args = Args::parse();
+    let args: Args = Args::parse();
     let f = PathBuf::from(args.config_file.unwrap_or(String::from("config.yaml")));
 
     let manager = SqliteConnectionManager::file("arce.db");
@@ -47,7 +56,7 @@ fn main() {
     env_logger::init();
 
     init();
-    loop{
+    loop {
         let t: i32 = read!();
         match t {
             1 => {
@@ -56,26 +65,21 @@ fn main() {
                 let path = PathBuf::from(path);
                 let deploy: String = read!();
                 let need_confirm: bool = read!();
-                let f = ArticleFolder{
+                let f = ArticleFolder {
                     path,
                     deploy,
-                    need_confirm
+                    need_confirm,
                 };
                 add_article_folder(&conn, f).unwrap();
-
-
-            },
+            }
             2 => {
                 let conn = GlobalConnPool::global().0.get().unwrap();
                 let path: String = read!();
                 let path = PathBuf::from(path);
-                let f = PictureFolder{
-                    path
-                };
+                let f = PictureFolder { path };
                 add_picture_folder(&conn, f).unwrap();
-            },
+            }
             _ => {}
         }
-        
     }
 }

@@ -1,6 +1,6 @@
 use exif::{In, Tag};
 use imagesize::size;
-use log::{info, warn, debug};
+use log::{debug, info, warn};
 use serde::Serialize;
 use std::path::PathBuf;
 use std::process::Command;
@@ -8,7 +8,7 @@ use std::process::Command;
 use crate::api::config::GlobalConfig;
 use crate::api::err;
 use crate::api::sync::GlobalConnPool;
-use crate::model::pictures::{insert_photography_picture, insert_picture, find_picture};
+use crate::model::pictures::{find_picture, insert_photography_picture, insert_picture};
 
 pub type PPictureList = Vec<PhotographyPicture>;
 
@@ -41,7 +41,7 @@ impl PhotographyPicture {
         let result = find_picture(&conn, &Picture::from(self.clone()))?;
         match result {
             None => Ok(false),
-            _ => Ok(true)
+            _ => Ok(true),
         }
     }
     pub fn from_dir(
@@ -69,18 +69,24 @@ pub struct Picture {
     pub hash: String,
     pub path: PathBuf,
 }
-impl Picture{
+impl Picture {
     pub fn from_dir(p: PathBuf) -> Result<Self, err::Error> {
         let bytes = std::fs::read(&p)?;
         let hash = sha256::digest(&*bytes);
-        Ok(Picture { hash_old: None, hash , path: p })
+        Ok(Picture {
+            hash_old: None,
+            hash,
+            path: p,
+        })
     }
 
     // both storing, registering and uploading
     pub fn register(mut self) -> Result<PathBuf, err::Error> {
         let config = GlobalConfig::global();
         let conn = GlobalConnPool::global().0.get().unwrap();
-        let to = config.pic_local.join(self.hash.clone() + "." + self.path.clone().extension().unwrap().to_str().unwrap());
+        let to = config.pic_local.join(
+            self.hash.clone() + "." + self.path.clone().extension().unwrap().to_str().unwrap(),
+        );
         std::fs::copy(&self.path, &to)?;
         self.path = to;
 
@@ -97,10 +103,9 @@ impl Picture{
                 warn!("Upload of picture {:?} to {:?} failed.", &self.path, &dst);
             }
             _ => {}
-        }; 
-        Ok(self.path)    
+        };
+        Ok(self.path)
     }
-
 }
 
 impl From<PhotographyPicture> for Picture {
@@ -185,9 +190,9 @@ impl PhotographyPicture {
         let size = std::fs::metadata(&self.path)?.len();
         if size < config.pic_compress_threshold {
             self.calc_hash()?;
-            let to = config
-                .pic_local
-                .join(self.hash.clone() + "." + self.path.clone().extension().unwrap().to_str().unwrap());
+            let to = config.pic_local.join(
+                self.hash.clone() + "." + self.path.clone().extension().unwrap().to_str().unwrap(),
+            );
             std::fs::copy(self.path, &to)?;
             self.path = to;
             return Ok(self);
@@ -207,9 +212,9 @@ impl PhotographyPicture {
         self.hash_old = Some(self.hash.clone());
         self.calc_hash()?;
 
-        let to = config
-            .pic_local
-            .join(self.hash.clone() + "." + self.path.clone().extension().unwrap().to_str().unwrap());
+        let to = config.pic_local.join(
+            self.hash.clone() + "." + self.path.clone().extension().unwrap().to_str().unwrap(),
+        );
         std::fs::rename(save, &to)?;
         self.path = to;
 
@@ -226,7 +231,7 @@ impl PhotographyPicture {
             + &config.scp_pic_path
             + "/"
             + self.path.file_name().unwrap().to_str().unwrap();
-        
+
         match Command::new("scp").arg(&self.path).arg(&dst).output() {
             Err(e) => {
                 warn!("Upload of picture {:?} to {:?} failed.", &self.path, &dst);
@@ -236,7 +241,6 @@ impl PhotographyPicture {
         Ok(())
     }
 }
-
 
 /// struct used for tera rendering
 #[derive(Serialize, Clone)]
@@ -253,7 +257,7 @@ pub struct PhotographyPictureBrief {
     pub direction: String,
 }
 
-impl From<PhotographyPicture> for PhotographyPictureBrief{
+impl From<PhotographyPicture> for PhotographyPictureBrief {
     fn from(p: PhotographyPicture) -> Self {
         debug!("Converting PP to PPB {:?}", p);
         PhotographyPictureBrief {
@@ -265,7 +269,7 @@ impl From<PhotographyPicture> for PhotographyPictureBrief{
             params: p.params,
             date: p.date,
             camera: p.camera,
-            direction: p.direction
+            direction: p.direction,
         }
     }
 }

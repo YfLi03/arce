@@ -22,7 +22,7 @@ impl Display for Reason {
             Reason::Internet => "SSH Error",
             Reason::Internal => "Tera or other Crates Error",
             Reason::PictureProcess => "Error Processing the Image",
-            Reason::ArticleRender => "Error Rendering Markdown to HTML"
+            Reason::ArticleRender => "Error Rendering Markdown to HTML",
         };
         write!(f, "{}", s)
     }
@@ -101,7 +101,7 @@ impl From<r2d2::Error> for Error {
 impl From<serde_yaml::Error> for Error {
     fn from(err: serde_yaml::Error) -> Self {
         warn!("{:?}", err);
-        Error{
+        Error {
             reason: Reason::Internal,
             message: err.to_string(),
         }
