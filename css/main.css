@@ -3,7 +3,6 @@
 .font-regular{
     font-family: 'Noto Serif SC', serif;
     font-weight: 300;
-    font-size: 1.1rem;
 }
 .article-brief {
     font-family: 'Open Sans', sans-serif;
@@ -35,6 +34,10 @@
 .typora p {
     margin: 0, 0, 20px, 0;
     line-height: 1.8;
+}
+
+.typora blockquote {
+    color: dimgrey;
 }
 
 .typora h1,h2,h3,h4 {
