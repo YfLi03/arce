@@ -75,6 +75,9 @@ fn is_markdown(p: &PathBuf) -> bool {
 
 fn add_article(p: PathBuf, f: &ArticleFolder, pool: &ConnPool) -> Result<(), err::Error> {
     info!("Adding Article {:?}", p);
+    
+    if !p.starts_with(&f.path) {return Ok(())};
+
     if !is_markdown(&p) {
         return Ok(());
     };
