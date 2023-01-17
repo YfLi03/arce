@@ -1,8 +1,9 @@
-@import url('https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@300;400;500&family=Open+Sans:wght@400;500;700&display=swap');
+@import url('https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@300;400;500;600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap');
 
 .font-regular{
     font-family: 'Noto Serif SC', serif;
     font-weight: 300;
+    font-size: 1.1rem;
 }
 .article-brief {
     font-family: 'Open Sans', sans-serif;
@@ -24,10 +25,20 @@
 .typora {
     font-family: 'Noto Serif SC', serif;
     font-weight: 400;
-    font-size: 1.1rem;
+    font-size: 1.25rem;
 }
 
 .typora img {
-    width: 80%;
+    width: 100%;
+}
+
+.typora p {
+    margin: 0, 0, 20px, 0;
+    line-height: 1.8;
+}
+
+.typora h1,h2,h3,h4 {
+    margin-top: 50px;
+    font-weight: bold;
 }
 
