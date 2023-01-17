@@ -153,6 +153,7 @@ fn read_article_header(mut content: String) -> Result<Article, err::Error> {
 fn markdown_paser(mut a: Article) -> Result<Article, err::Error> {
     let mut options = Options::empty();
     options.insert(Options::ENABLE_STRIKETHROUGH);
+    options.insert(Options::ENABLE_TABLES);
 
     let parser = Parser::new_ext(&a.content, options);
     let mut output = String::new();
