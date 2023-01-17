@@ -1,6 +1,6 @@
 use exif::{In, Tag};
 use imagesize::size;
-use log::{info, warn};
+use log::{info, warn, debug};
 use serde::Serialize;
 use std::path::PathBuf;
 use std::process::Command;
@@ -8,11 +8,11 @@ use std::process::Command;
 use crate::api::config::GlobalConfig;
 use crate::api::err;
 use crate::api::sync::GlobalConnPool;
-use crate::model::pictures::{insert_photography_picture, insert_picture};
+use crate::model::pictures::{insert_photography_picture, insert_picture, find_picture};
 
 pub type PPictureList = Vec<PhotographyPicture>;
 
-#[derive(Default, Clone, Serialize)]
+#[derive(Default, Clone, Serialize, Debug)]
 pub struct PhotographyPicture {
     pub hash_old: Option<String>,
     pub hash: String,
@@ -34,6 +34,16 @@ impl PhotographyPicture {
         self.hash = sha256::digest(&*bytes);
         Ok(())
     }
+
+    pub fn is_registered(&mut self) -> Result<bool, err::Error> {
+        self.calc_hash()?;
+        let conn = GlobalConnPool::global().0.get().unwrap();
+        let result = find_picture(&conn, &Picture::from(self.clone()))?;
+        match result {
+            None => Ok(false),
+            _ => Ok(true)
+        }
+    }
     pub fn from_dir(
         path: PathBuf,
         selected: bool,
@@ -53,6 +63,7 @@ impl PhotographyPicture {
     }
 }
 
+#[derive(Debug)]
 pub struct Picture {
     pub hash_old: Option<String>,
     pub hash: String,
@@ -69,7 +80,7 @@ impl Picture{
     pub fn register(mut self) -> Result<PathBuf, err::Error> {
         let config = GlobalConfig::global();
         let conn = GlobalConnPool::global().0.get().unwrap();
-        let to = config.pic_local.join(self.hash.clone() + self.path.clone().extension().unwrap().to_str().unwrap());
+        let to = config.pic_local.join(self.hash.clone() + "." + self.path.clone().extension().unwrap().to_str().unwrap());
         std::fs::copy(&self.path, &to)?;
         self.path = to;
 
@@ -176,7 +187,7 @@ impl PhotographyPicture {
             self.calc_hash()?;
             let to = config
                 .pic_local
-                .join(self.hash.clone() + self.path.clone().extension().unwrap().to_str().unwrap());
+                .join(self.hash.clone() + "." + self.path.clone().extension().unwrap().to_str().unwrap());
             std::fs::copy(self.path, &to)?;
             self.path = to;
             return Ok(self);
@@ -190,7 +201,7 @@ impl PhotographyPicture {
         let hash = sha256::digest(image.as_bytes());
         let save = config
             .pic_local
-            .join(hash + self.path.clone().extension().unwrap().to_str().unwrap());
+            .join(hash + "." + self.path.clone().extension().unwrap().to_str().unwrap());
         image.save(&save)?;
         self.path = save.clone();
         self.hash_old = Some(self.hash.clone());
@@ -198,7 +209,7 @@ impl PhotographyPicture {
 
         let to = config
             .pic_local
-            .join(self.hash.clone() + self.path.clone().extension().unwrap().to_str().unwrap());
+            .join(self.hash.clone() + "." + self.path.clone().extension().unwrap().to_str().unwrap());
         std::fs::rename(save, &to)?;
         self.path = to;
 
@@ -215,6 +226,7 @@ impl PhotographyPicture {
             + &config.scp_pic_path
             + "/"
             + self.path.file_name().unwrap().to_str().unwrap();
+        
         match Command::new("scp").arg(&self.path).arg(&dst).output() {
             Err(e) => {
                 warn!("Upload of picture {:?} to {:?} failed.", &self.path, &dst);
@@ -243,6 +255,7 @@ pub struct PhotographyPictureBrief {
 
 impl From<PhotographyPicture> for PhotographyPictureBrief{
     fn from(p: PhotographyPicture) -> Self {
+        debug!("Converting PP to PPB {:?}", p);
         PhotographyPictureBrief {
             selected: p.selected,
             title: p.title,

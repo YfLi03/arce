@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+use log::debug;
 use rusqlite::params;
 use rusqlite::Connection;
 
@@ -27,6 +28,7 @@ pub fn find_picture(conn: &Connection, p: &Picture) -> Result<Option<PathBuf>, e
 
 pub fn insert_picture(conn: &Connection, p: &Picture) -> Result<PathBuf, err::Error> {
     if let Some(path) = find_picture(conn, &p)? {
+        debug!("Pic already exists {:?}", p);
         return Ok(path);
     }
 
@@ -45,7 +47,7 @@ pub fn insert_photography_picture(
     p: &mut PhotographyPicture,
 ) -> Result<PathBuf, err::Error> {
     let mut stmt = conn.prepare(
-        "SELECT * FROM pictures WHERE\
+        "SELECT * FROM pictures WHERE \
     HASH = ?1 AND PHOTOGRAPHY = true",
     )?;
     let mut rows = stmt.query(params![p.hash])?;
@@ -55,7 +57,7 @@ pub fn insert_photography_picture(
 
     if let Some(ref hash) = p.hash_old {
         let mut stmt = conn.prepare(
-            "SELECT * FROM pictures WHERE\
+            "SELECT * FROM pictures WHERE \
         HASH_OLD = ?1 AND PHOTOGRAPHY = true",
         )?;
         let mut rows = stmt.query(params![hash])?;
@@ -67,7 +69,7 @@ pub fn insert_photography_picture(
     let mut stmt = conn.prepare(
         "INSERT INTO pictures\
     (PATH, HASH, PHOTOGRAPHY, HASH_OLD, SELECTED, TITLE, PARAMS, DATE, CAMERA, DIRECTION, ARTICLE)\
-    VALUES (?1, ?2, true, ?3, ?4. ?5, ?6, ?7, ?8, ?9, ?10)\
+    VALUES (?1, ?2, true, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)\
     ",
     )?;
     stmt.execute(params![
@@ -101,7 +103,7 @@ pub fn get_photography_pictures(conn: &Connection) -> Result<PPictureList, err::
             date: row.get("DATE")?,
             camera: row.get("CAMERA")?,
             direction: row.get("DIRECTION")?,
-            article_link: row.get("ARTICLE_LINK")?,
+            article_link: row.get("ARTICLE")?,
         })
     }
     Ok(pictures)

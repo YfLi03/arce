@@ -3,7 +3,7 @@ subtitle: vision
 foot: someone © 2022
 beian: 沪ICP备XXXXXX号
 
-pic_cloud_prefix: pic.iceeera.com
+pic_cloud_prefix: http://pic.iceeera.com
 pic_local: /Users/yfli/Code/temp/pic
 pic_compress_threshold: 10000000
 pic_replace_prefix: /Users/yfli

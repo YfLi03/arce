@@ -47,9 +47,10 @@ pub fn delete_article(conn: &Connection, p: PathBuf) -> Result<(), err::Error> {
 pub fn init(conn: &Connection) -> Result<(), err::Error> {
     conn.execute(
         "CREATE TABLE IF NOT EXISTS articles (\
-        PATH            TEXT        NOT NULL    PRIMARY KEY,\
+        PATH            TEXT        NOT NULL,\
         DEPLOY_FOLDER   BOOLEAN     NOT NULL,\
-        TIME            INTEGER     NOT NULL\
+        TIME            INTEGER     NOT NULL,\
+        PRIMARY KEY(PATH, DEPLOY_FOLDER)\
         )",
         [],
     )?;
