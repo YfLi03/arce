@@ -49,10 +49,10 @@ fn watch_article_folder(folder: ArticleFolder, pool: ConnPool) -> Result<(), err
             EventKind::Modify(_) => {
                 if event.paths.len() == 1 {
                     add_article(event.paths[0].clone(), &folder, &pool)?;
-                    continue;
+                } else {
+                    remove_article(event.paths[0].clone(), &pool)?;
+                    add_article(event.paths[1].clone(), &folder, &pool)?;
                 }
-                remove_article(event.paths[0].clone(), &pool)?;
-                add_article(event.paths[1].clone(), &folder, &pool)?;
             }
             EventKind::Remove(RemoveKind::File) => {
                 remove_article(event.paths[0].clone(), &pool)?;
