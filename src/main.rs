@@ -4,6 +4,7 @@ use api::{
     sync::{ConnPool, GlobalConnPool, NeedPublish, CONN_POOL, NEED_PUBLISH},
 };
 use clap::{ArgAction, Parser};
+use env_logger::Env;
 use log::info;
 use model::folders::{add_article_folder, add_picture_folder};
 use r2d2_sqlite::SqliteConnectionManager;
@@ -53,7 +54,10 @@ fn init() {
 }
 
 fn main() {
-    env_logger::init();
+    let env = Env::default()
+    .filter_or("MY_LOG_LEVEL", "trace")
+    .write_style_or("MY_LOG_STYLE", "always");
+    env_logger::init_from_env(env);
 
     init();
     loop {
