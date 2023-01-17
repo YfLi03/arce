@@ -87,6 +87,9 @@ impl Picture {
         let to = config.pic_local.join(
             self.hash.clone() + "." + self.path.clone().extension().unwrap().to_str().unwrap(),
         );
+        if let Some(p) = find_picture(&conn, &self)? {
+            return Ok(p);
+        }
         std::fs::copy(&self.path, &to)?;
         self.path = to;
 

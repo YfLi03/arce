@@ -1,5 +1,5 @@
 use lazy_static::lazy_static;
-use log::{info, warn};
+use log::{info, warn, debug};
 use pulldown_cmark::{html, Options, Parser};
 use regex::Regex;
 use serde::Serialize;
@@ -256,8 +256,9 @@ fn article_category(articles: Vec<Article>) -> Result<(), err::Error> {
         .into_iter()
         .map(|x| x.category)
         .collect::<Vec<String>>();
-    categories.dedup();
     categories.sort();
+    categories.dedup();
+    debug!("Categories {:?}",categories);
     let categories: Vec<Category> = categories.into_iter().map(|c| Category::new(c)).collect();
     context.insert("categories", &categories);
 

@@ -46,10 +46,7 @@ fn watch_article_folder(folder: ArticleFolder, pool: ConnPool) -> Result<(), err
             EventKind::Create(CreateKind::File) => {
                 add_article(event.paths[0].clone(), &folder, &pool)?;
             }
-            EventKind::Modify(ModifyKind::Data(_)) => {
-                add_article(event.paths[0].clone(), &folder, &pool)?;
-            }
-            EventKind::Modify(ModifyKind::Name(_)) => {
+            EventKind::Modify(_) => {
                 if event.paths.len() == 1 {
                     add_article(event.paths[0].clone(), &folder, &pool)?;
                     continue;
