@@ -1,0 +1,290 @@
+.typora html {
+	font-size: 19px;
+}
+
+.typora html, body {
+	margin: auto;
+	background: #fefefe;
+	-webkit-font-smoothing: antialiased;
+}
+.typora body {
+	font-family: "Vollkorn", Palatino, Times;
+	color: #333;
+	line-height: 1.4;
+	text-align: justify;
+}
+
+.typora #write {
+	max-width: 960px;
+	margin: 0 auto;
+	margin-bottom: 2em;
+	line-height: 1.53;
+	padding-top: 40px;
+}
+
+@media only screen and (min-width: 1400px) {
+	#write {
+		max-width: 1100px;
+	}
+}
+
+@media print {
+	html {
+		font-size: 13px;
+	}
+}
+
+/* Typography
+-------------------------------------------------------- */
+
+.typora #write>h1:first-child,
+.typora h1 {
+	margin-top: 1.6em;
+	font-weight: normal;
+}
+
+.typora h1 {
+	font-size:3em;
+}
+
+.typora h2 {
+	margin-top:2em;
+	font-weight: normal;
+}
+
+.typora h3 {
+	font-weight: normal;
+	font-style: italic;
+	margin-top: 3em;
+}
+
+.typora h1, h2, h3{
+	text-align: center;
+}
+
+.typora h2:after{
+	border-bottom: 1px solid #2f2f2f;
+    content: '';
+    width: 100px;
+    display: block;
+    margin: 0 auto;
+    height: 1px;
+}
+
+.typora h1+h2, h2+h3 {
+	margin-top: 0.83em;
+}
+
+.typora p,
+.mathjax-block {
+	margin-top: 0;
+	-webkit-hypens: auto;
+	-moz-hypens: auto;
+	hyphens: auto;
+}
+.typora ul {
+	list-style: square;
+	padding-left: 1.2em;
+}
+.typora ol {
+	padding-left: 1.2em;
+}
+.typora blockquote {
+	margin-left: 1em;
+	padding-left: 1em;
+	border-left: 1px solid #ddd;
+}
+.typora code,
+pre {
+	font-family: "Consolas", "Menlo", "Monaco", monospace, serif;
+	font-size: .9em;
+	background: white;
+}
+.typora .md-fences{
+	margin-left: 1em;
+	padding-left: 1em;
+	border: 1px solid #ddd;
+	padding-bottom: 8px;
+	padding-top: 6px;
+	margin-bottom: 1.5em;
+}
+
+.typora a {
+	color: #2484c1;
+	text-decoration: none;
+}
+.typora a:hover {
+	text-decoration: underline;
+}
+.typora a img {
+	border: none;
+}
+.typora h1 a,
+h1 a:hover {
+	color: #333;
+	text-decoration: none;
+}
+.typora hr {
+	color: #ddd;
+	height: 1px;
+	margin: 2em 0;
+	border-top: solid 1px #ddd;
+	border-bottom: none;
+	border-left: 0;
+	border-right: 0;
+}
+.typora .ty-table-edit {
+	background: #ededed;
+    padding-top: 4px;
+}
+.typora table {
+	margin-bottom: 1.333333rem
+}
+.typora table th,
+table td {
+	padding: 8px;
+	line-height: 1.333333rem;
+	vertical-align: top;
+	border-top: 1px solid #ddd
+}
+.typora table th {
+	font-weight: bold
+}
+.typora table thead th {
+	vertical-align: bottom
+}
+.typora table caption+thead tr:first-child th,
+.typora table caption+thead tr:first-child td,
+.typora table colgroup+thead tr:first-child th,
+.typora table colgroup+thead tr:first-child td,
+.typora table thead:first-child tr:first-child th,
+.typora table thead:first-child tr:first-child td {
+	border-top: 0
+}
+.typora table tbody+tbody {
+	border-top: 2px solid #ddd
+}
+
+.typora .task-list{
+	padding:0;
+}
+
+.typora .md-task-list-item {
+	padding-left: 1.6rem;
+}
+
+.typora .md-task-list-item > input:before {
+	content: '\221A';
+	display: inline-block;
+	width: 1.33333333rem;
+  	height: 1.6rem;
+	vertical-align: middle;
+	text-align: center;
+	color: #ddd;
+	background-color: #fefefe;
+}
+
+.typora .md-task-list-item > input:checked:before,
+.typora .md-task-list-item > input[checked]:before{
+	color: inherit;
+}
+.typora .md-tag {
+	color: inherit;
+	font: inherit;
+}
+.typora #write pre.md-meta-block {
+	min-height: 35px;
+	padding: 0.5em 1em;
+}
+.typora #write pre.md-meta-block {
+	white-space: pre;
+	background: #f8f8f8;
+	border: 0px;
+	color: #999;
+	
+	width: 100vw;
+	max-width: calc(100% + 60px);
+	margin-left: -30px;
+	border-left: 30px #f8f8f8 solid;
+	border-right: 30px #f8f8f8 solid;
+
+	margin-bottom: 2em;
+	margin-top: -1.3333333333333rem;
+	padding-top: 26px;
+	padding-bottom: 10px;
+	line-height: 1.8em;
+	font-size: 0.9em;
+	font-size: 0.76em;
+	padding-left: 0;
+}
+.typora .md-img-error.md-image>.md-meta{
+	vertical-align: bottom;
+}
+.typora #write>h5.md-focus:before {
+	top: 2px;
+}
+
+.typora .md-toc {
+	margin-top: 40px;
+}
+
+.typora .md-toc-content {
+	padding-bottom: 20px;
+}
+
+.typora .outline-expander:before {
+	color: inherit;
+	font-size: 14px;
+	top: auto;
+	content: "\f0da";
+	font-family: FontAwesome;
+}
+
+.typora .outline-expander:hover:before,
+.typora .outline-item-open>.outline-item>.outline-expander:before {
+  	content: "\f0d7";
+}
+
+/** source code mode */
+.typora #typora-source {
+	font-family: Courier, monospace;
+    color: #6A6A6A;
+}
+
+.typora .html-for-mac #typora-sidebar {
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+}
+
+.typora .cm-s-typora-default .cm-header, 
+.typora .cm-s-typora-default .cm-property,
+.typora .CodeMirror.cm-s-typora-default div.CodeMirror-cursor {
+	color: #428bca;
+}
+
+.typora .cm-s-typora-default .cm-atom, .cm-s-typora-default .cm-number {
+	color: #777777;
+}
+
+.typora .typora-node .file-list-item-parent-loc, 
+.typora .typora-node .file-list-item-time, 
+.typora .typora-node .file-list-item-summary {
+	font-family: arial, sans-serif;
+}
+
+.typora .md-task-list-item>input {
+    margin-left: -1.3em;
+    margin-top: calc(1rem - 12px);
+}
+
+.typora .md-mathjax-midline {
+	background: #fafafa;
+}
+
+.typora .md-fences .code-tooltip {
+	bottom: -2em !important;
+}
+
+.typora .dropdown-menu .divider {
+	border-color: #e5e5e5;
+}

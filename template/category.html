@@ -6,15 +6,17 @@
 <body>
 <div class="container-fluid bg-light pt-0 pb-3 px-0">
     {% include "partial/header.html" %}
+    <br/>
+    <br/>
 
     <div class="row px-3">
         <div class="col-0 col-lg-2"></div>
-            <div class="col-12 col-lg-8">
+            <div class="col-12 col-lg-8 article-brief">
                 {% for article_brief in article_briefs %}
                 <a rel="noopener" href="{{article_brief.url}}" style="color:black;" class="font-header">
                     <h2>{{article_brief.title}}</h2>
-                    <h4><small>{{article_brief.date}}</small></h4>
-                    <p>{{article_brief.summary}}</p>
+                    <p class="typora">{{article_brief.date}}</p>
+                    <p class="typora">{{article_brief.summary}}</p>
                 </a>
                 <hr>
                 {% endfor %}

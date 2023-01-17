@@ -9,12 +9,11 @@
     <div class="row p-3">
         <div class="col-0 col-lg-2"></div>
         <div class="col-12 col-lg-8">
-                <div>
+                
+                <div class="typora">
                     <h2>{{article.title}}</h2>
-                    <div>{{article.date}}</div>
-                    <hr/>
-                </div>
-                <div class="article-content">
+                    <center>{{article.date}}</center>
+                    <br/>
                     {{article.content | safe}}
                </div>
         </div>

@@ -25,16 +25,25 @@ fn watch_article_folder(
     folder: ArticleFolder,
     pool: ConnPool,
 ) -> Result<(), err::Error> {
+    info!("Initing Article Folder {:?}", &folder);
     let (tx, rx) = std::sync::mpsc::channel();
+    let files = folder.path.read_dir()?;
+    for file in files {
+        let file = file?;
+        add_article(file.path(), &folder, &pool)?;
+    }
 
     let mut watcher = RecommendedWatcher::new(tx, Config::default())?;
     watcher.watch(folder.path.as_ref(), RecursiveMode::NonRecursive)?;
 
+    info!("Monitoring Article Folder {:?}", &folder);
     for res in rx {
         let event = match res {
             Ok(event) => event,
             Err(e) => return Err(e.into()),
         };
+
+        info!("Event noticed {:?}", event);
 
         match event.kind {
             EventKind::Create(CreateKind::File) => {
@@ -71,6 +80,7 @@ fn is_markdown(p: &PathBuf) -> bool {
 // for articles, notifier use db operations directly
 
 fn add_article(p: PathBuf, f: &ArticleFolder, pool: &ConnPool) -> Result<(), err::Error> {
+    info!("Adding Article {:?}", p);
     if !is_markdown(&p) {
         return Ok(());
     };
@@ -82,6 +92,7 @@ fn add_article(p: PathBuf, f: &ArticleFolder, pool: &ConnPool) -> Result<(), err
 }
 
 fn remove_article(p: PathBuf, pool: &ConnPool) -> Result<(), err::Error> {
+    info!("Removing Article {:?}", p);
     if !is_markdown(&p) {
         return Ok(());
     };

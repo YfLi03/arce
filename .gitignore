@@ -6,3 +6,4 @@
 pics.json
 .idea
 *.db
+.DS_store

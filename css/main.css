@@ -1,10 +1,28 @@
-@import url('https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@300&family=Open+Sans:wght@700&display=swap');
+@import url('https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@300;400;500&family=Open+Sans:wght@400;500;700&display=swap');
 
 .font-regular{
     font-family: 'Noto Serif SC', serif;
+    font-weight: 300;
+}
+.article-brief {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 500;
+    text-align: left;
+}
+
+.article-brief h2{
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 500;
+    text-align: left;
 }
 
 .font-header{
     font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+}
+
+.typora {
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 400;
 }
 

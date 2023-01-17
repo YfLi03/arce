@@ -4,7 +4,6 @@ use pulldown_cmark::{Options, Parser, html};
 use lazy_static::lazy_static;
 use regex::Regex;
 use serde::Serialize;
-use serde_json::map;
 use slug::slugify;
 use tera::{Tera, Context};
 
@@ -76,6 +75,7 @@ fn init() -> Result<(), err::Error>{
         create_dir_all(folder)?;
     }
     copy("css/main.css", "public/css/main.css")?;
+    copy("css/typora.css", "public/css/typora.css")?;
     let names: Vec<_> = TERA.get_template_names().collect();
     info!("Parsed {} Templates: {:?}", names.len(), names);
     Ok(())

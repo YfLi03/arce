@@ -6,10 +6,13 @@
 <body>
 <div class="container-fluid bg-light pt-0 pb-3 px-0">
     {% include "partial/header.html" %}
+    <br/>
+    <br/>
+    
 
     <div class="row px-3">
         <div class="col-0 col-lg-2"></div>
-            <div class="col-12 col-lg-8">
+            <div class="col-12 col-lg-8 article-brief">
                 {% for category in categories %}
                 <a rel="noopener" href="{{category.url}}" style="color:black;" class="font-header">
                     <h2>{{category.title}}</h2>
