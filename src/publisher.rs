@@ -87,7 +87,7 @@ struct Category {
 impl Category {
     fn new(s: String) -> Self {
         Category {
-            url: "category/".to_string() + &slugify(&s) + ".html",
+            url: "/category/".to_string() + &slugify(&s) + ".html",
             title: s,
         }
     }
@@ -231,6 +231,23 @@ fn index(articles: Vec<Article>) -> Result<(), err::Error> {
     Ok(())
 }
 
+fn article(articles: Vec<Article>, c: Category) -> Result<(), err::Error> {
+    let mut context = Context::new();
+    let config = GlobalConfig::global();
+    context.insert("global", config);
+    context.insert("need_nav", &false);
+    context.insert("category", &c);
+    for a in articles {
+        context.insert(
+            "page",
+            &Page::new(4, a.title.to_string() + " | " + &config.title),
+        );
+        context.insert("article", &a);
+        gen_html(&context, "article.html", &("public".to_string() + &a.url))?;
+    }
+    Ok(())
+}
+
 fn category(c: Category, a: Vec<Article>) -> Result<(), err::Error> {
     let mut context = Context::new();
     let config = GlobalConfig::global();
@@ -242,6 +259,9 @@ fn category(c: Category, a: Vec<Article>) -> Result<(), err::Error> {
 
     context.insert("article_briefs", &articles);
     gen_html(&context, "category.html", &("public/".to_string() + &c.url))?;
+
+    article(articles, c)?;
+
     Ok(())
 }
 
@@ -325,22 +345,6 @@ fn picture(pictures: Vec<PhotographyPictureBrief>) -> Result<(), err::Error> {
     Ok(())
 }
 
-fn article(articles: Vec<Article>) -> Result<(), err::Error> {
-    let mut context = Context::new();
-    let config = GlobalConfig::global();
-    context.insert("global", config);
-    context.insert("need_nav", &false);
-    for a in articles {
-        context.insert(
-            "page",
-            &Page::new(4, a.title.to_string() + " | " + &config.title),
-        );
-        context.insert("article", &a);
-        gen_html(&context, "article.html", &("public".to_string() + &a.url))?;
-    }
-    Ok(())
-}
-
 fn render() -> Result<(), err::Error> {
     info!("Rendering");
     let articles = process_articles()?;
@@ -357,7 +361,6 @@ fn render() -> Result<(), err::Error> {
     gallery(pictures.clone())?;
     picture(pictures.clone())?;
 
-    article(articles)?;
     info!("Rendered");
     Ok(())
 }

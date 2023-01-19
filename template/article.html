@@ -13,6 +13,7 @@
                 <div class="typora">
                     <h2>{{article.title}}</h2>
                     <center>{{article.date}}</center>
+                    <center>分类: <a href="{{category.url}}" style="color:black; text-decoration: underline;">{{category.title}}</a></center>
                     <br/>
                     {{article.content | safe}}
                </div>
