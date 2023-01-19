@@ -1,14 +1,14 @@
 use std::path::PathBuf;
 
 use log::debug;
-use rusqlite::params;
-use rusqlite::Connection;
+use rusqlite::{params,Connection};
 
 use crate::api::err;
-use crate::api::pictures::PPictureList;
-use crate::api::pictures::PhotographyPicture;
-use crate::api::pictures::Picture;
+use crate::api::pictures::{PPictureList, PhotographyPicture, Picture};
 
+/// finding a picture in the database. both hash and old hash is used.
+/// returns Ok(none) if it's not found
+/// returns Some(path) if it exists. the path is the actual path locally
 pub fn find_picture(conn: &Connection, p: &Picture) -> Result<Option<PathBuf>, err::Error> {
     let mut stmt = conn.prepare("SELECT * FROM pictures WHERE HASH = ?1")?;
     let mut rows = stmt.query(params![p.hash])?;
@@ -23,10 +23,15 @@ pub fn find_picture(conn: &Connection, p: &Picture) -> Result<Option<PathBuf>, e
             return Ok(Some(PathBuf::from(row.get::<&str, String>("PATH")?)));
         };
     };
+    
     Ok(None)
 }
 
+/// inserting a picture
+/// returns the path of the inserted picture, which may not be that of which you inserted
+/// as the picture may already exist in the database
 pub fn insert_picture(conn: &Connection, p: &Picture) -> Result<PathBuf, err::Error> {
+    // pictures not labeled as photoography can't be compressed
     if let Some(path) = find_picture(conn, &p)? {
         debug!("Pic already exists {:?}", p);
         return Ok(path);
@@ -39,13 +44,18 @@ pub fn insert_picture(conn: &Connection, p: &Picture) -> Result<PathBuf, err::Er
     ",
     )?;
     stmt.execute(params![p.path.to_str(), p.hash, p.hash_old])?;
+
     Ok(p.path.clone())
 }
 
+/// inserting a photography picture
+/// returns the path of the inserted picture, which may not be that of which you inserted
+/// as the picture may already exist in the database, and is labeled as photography
 pub fn insert_photography_picture(
     conn: &Connection,
     p: &mut PhotographyPicture,
 ) -> Result<PathBuf, err::Error> {
+
     let mut stmt = conn.prepare(
         "SELECT * FROM pictures WHERE \
     HASH = ?1 AND PHOTOGRAPHY = true",
@@ -84,15 +94,16 @@ pub fn insert_photography_picture(
         p.direction,
         p.article_link
     ])?;
+
     Ok(p.path.clone())
 }
 
+/// getting all the pictures labeled as PHOTOGRAPHY
 pub fn get_photography_pictures(conn: &Connection) -> Result<PPictureList, err::Error> {
     let mut stmt = conn.prepare("SELECT * FROM pictures WHERE PHOTOGRAPHY = true")?;
     let mut rows = stmt.query([])?;
     let mut pictures = PPictureList::new();
     while let Some(row) = rows.next()? {
-        // TODO: Need Checking Here
         pictures.push(PhotographyPicture {
             hash_old: row.get("HASH_OLD")?,
             hash: row.get("HASH")?,
@@ -109,6 +120,7 @@ pub fn get_photography_pictures(conn: &Connection) -> Result<PPictureList, err::
     Ok(pictures)
 }
 
+/// initializing pictures table
 pub fn init(conn: &Connection) -> Result<(), err::Error> {
     conn.execute(
         "CREATE TABLE IF NOT EXISTS pictures (\

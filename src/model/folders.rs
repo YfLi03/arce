@@ -6,6 +6,7 @@ use rusqlite::Connection;
 use crate::api::err;
 use crate::api::folders::{ArticleFolder, ArticleFolderList, PictureFolder, PictureFolderList};
 
+/// getting the article folders that should be monitored
 pub fn get_article_folders(conn: &Connection) -> Result<ArticleFolderList, err::Error> {
     let mut stmt = conn.prepare("SELECT * FROM article_folders")?;
     let mut rows = stmt.query(params![])?;
@@ -20,6 +21,7 @@ pub fn get_article_folders(conn: &Connection) -> Result<ArticleFolderList, err::
     Ok(folders)
 }
 
+/// getting the picture folders that should be monitored
 pub fn get_picture_folders(conn: &Connection) -> Result<PictureFolderList, err::Error> {
     let mut stmt = conn.prepare("SELECT * FROM picture_folders")?;
     let mut rows = stmt.query(params![])?;
@@ -32,6 +34,7 @@ pub fn get_picture_folders(conn: &Connection) -> Result<PictureFolderList, err::
     Ok(folders)
 }
 
+/// adding an article folder that should be monitored
 pub fn add_article_folder(conn: &Connection, f: ArticleFolder) -> Result<(), err::Error> {
     let mut stmt = conn.prepare(
         "INSERT INTO article_folders\
@@ -42,6 +45,7 @@ pub fn add_article_folder(conn: &Connection, f: ArticleFolder) -> Result<(), err
     Ok(())
 }
 
+/// adding a picture folder that should be monitored
 pub fn add_picture_folder(conn: &Connection, f: PictureFolder) -> Result<(), err::Error> {
     let mut stmt = conn.prepare(
         "INSERT INTO picture_folders\
@@ -52,6 +56,7 @@ pub fn add_picture_folder(conn: &Connection, f: PictureFolder) -> Result<(), err
     Ok(())
 }
 
+/// initializing folders 
 pub fn init(conn: &Connection) -> Result<(), err::Error> {
     conn.execute(
         "CREATE TABLE IF NOT EXISTS article_folders (\

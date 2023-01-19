@@ -8,8 +8,8 @@ pub enum Reason {
     ArticleRender,
     Filesystem,
     PictureProcess,
-    Config,
-    Internet,
+    // Config,       Config errors are unwrapped directly
+    // Internet,     Internet errors are addressed directly
     Internal,
 }
 
@@ -18,8 +18,8 @@ impl Display for Reason {
         let s = match self {
             Reason::Database => "Sqlite or R2d2 Error",
             Reason::Filesystem => "File Notification Error",
-            Reason::Config => "config.yaml Error",
-            Reason::Internet => "SSH Error",
+            // Reason::Config => "config.yaml Error",
+            // Reason::Internet => "SSH Error",
             Reason::Internal => "Tera or other Crates Error",
             Reason::PictureProcess => "Error Processing the Image",
             Reason::ArticleRender => "Error Rendering Markdown to HTML",

@@ -3,10 +3,10 @@ subtitle: vision
 foot: someone © 2022
 beian: 沪ICP备XXXXXX号
 
-pic_cloud_prefix: http://pic.iceeera.com
-pic_local: /Users/yfli/Code/temp/pic
+pic_cloud_prefix: http://xxx.xxx.com
+pic_local: /Users/xxx/xxx
 pic_compress_threshold: 10000000
-pic_replace_prefix: /Users/yfli
+pic_replace_prefix: /Users/xxx
 
 scp_server: tcloud
 scp_pic_path: /web/test/pic
