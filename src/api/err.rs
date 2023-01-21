@@ -28,6 +28,7 @@ impl Display for Reason {
     }
 }
 
+/// Self defined Error type, so that errors are passed elegantly
 #[derive(Debug, Serialize)]
 pub struct Error {
     pub reason: Reason,

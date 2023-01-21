@@ -56,7 +56,7 @@ pub fn add_picture_folder(conn: &Connection, f: PictureFolder) -> Result<(), err
     Ok(())
 }
 
-/// initializing folders 
+/// initializing folders
 pub fn init(conn: &Connection) -> Result<(), err::Error> {
     conn.execute(
         "CREATE TABLE IF NOT EXISTS article_folders (\

@@ -1,19 +1,15 @@
 use api::{
     config::{GlobalConfig, CONFIG},
     folders::{ArticleFolder, PictureFolder},
-    sync::{ConnPool, GlobalConnPool, NeedPublish, CONN_POOL, NEED_PUBLISH},
+    sync::{GlobalConnPool, NeedPublish, CONN_POOL, NEED_PUBLISH},
 };
-use clap::{ArgAction, Parser};
+
+use clap::Parser;
 use env_logger::Env;
 use log::info;
 use model::folders::{add_article_folder, add_picture_folder};
 use r2d2_sqlite::SqliteConnectionManager;
-use std::{
-    collections::HashSet,
-    fs::read_dir,
-    path::PathBuf,
-    thread::{self, Thread},
-};
+use std::path::PathBuf;
 use text_io::read;
 
 mod api;
@@ -27,6 +23,9 @@ struct Args {
     config_file: Option<String>,
 }
 
+/// Initialize Main
+/// Parse The Args, Read the Config, and init many others
+/// including threads and global vars
 fn init() {
     info!("Initializing");
     let args: Args = Args::parse();
@@ -54,15 +53,20 @@ fn init() {
 }
 
 fn main() {
+    // initializing logger to always level
     let env = Env::default()
-    .filter_or("MY_LOG_LEVEL", "trace")
-    .write_style_or("MY_LOG_STYLE", "always");
+        .filter_or("MY_LOG_LEVEL", "trace")
+        .write_style_or("MY_LOG_STYLE", "always");
     env_logger::init_from_env(env);
 
     init();
+
+    // loop for adding folders
+    // it's only a temporary solution
     loop {
         let t: i32 = read!();
         match t {
+            // 1 means Article folder
             1 => {
                 let conn = GlobalConnPool::global().0.get().unwrap();
                 let path: String = read!();
@@ -76,6 +80,7 @@ fn main() {
                 };
                 add_article_folder(&conn, f).unwrap();
             }
+            // 2 means Picture folder
             2 => {
                 let conn = GlobalConnPool::global().0.get().unwrap();
                 let path: String = read!();

@@ -12,6 +12,7 @@ use crate::model::pictures::{find_picture, insert_photography_picture, insert_pi
 
 pub type PPictureList = Vec<PhotographyPicture>;
 
+/// Pictures marked as Photoography
 #[derive(Default, Clone, Serialize, Debug)]
 pub struct PhotographyPicture {
     pub hash_old: Option<String>,
@@ -29,12 +30,14 @@ pub struct PhotographyPicture {
 }
 
 impl PhotographyPicture {
+    /// calculate the hash of a file
     fn calc_hash(&mut self) -> Result<(), err::Error> {
         let bytes = std::fs::read(&self.path)?;
         self.hash = sha256::digest(&*bytes);
         Ok(())
     }
 
+    /// determine whether a picture exists in the database
     pub fn is_registered(&mut self) -> Result<bool, err::Error> {
         self.calc_hash()?;
         let conn = GlobalConnPool::global().0.get().unwrap();
@@ -44,6 +47,8 @@ impl PhotographyPicture {
             _ => Ok(true),
         }
     }
+
+    /// generating a new PhotographyPicture struct
     pub fn from_dir(
         path: PathBuf,
         selected: bool,
@@ -51,7 +56,8 @@ impl PhotographyPicture {
         title: String,
     ) -> Result<Self, err::Error> {
         let bytes = std::fs::read(&path)?;
-        let hash = sha256::digest(&*bytes);
+        let hash = sha256::digest(&*bytes); // calc_hash can't be used yet
+
         Ok(PhotographyPicture {
             path,
             selected,
@@ -61,67 +67,8 @@ impl PhotographyPicture {
             ..Default::default()
         })
     }
-}
 
-#[derive(Debug)]
-pub struct Picture {
-    pub hash_old: Option<String>,
-    pub hash: String,
-    pub path: PathBuf,
-}
-impl Picture {
-    pub fn from_dir(p: PathBuf) -> Result<Self, err::Error> {
-        let bytes = std::fs::read(&p)?;
-        let hash = sha256::digest(&*bytes);
-        Ok(Picture {
-            hash_old: None,
-            hash,
-            path: p,
-        })
-    }
-
-    // both storing, registering and uploading
-    pub fn register(mut self) -> Result<PathBuf, err::Error> {
-        let config = GlobalConfig::global();
-        let conn = GlobalConnPool::global().0.get().unwrap();
-        let to = config.pic_local.join(
-            self.hash.clone() + "." + self.path.clone().extension().unwrap().to_str().unwrap(),
-        );
-        if let Some(p) = find_picture(&conn, &self)? {
-            return Ok(p);
-        }
-        std::fs::copy(&self.path, &to)?;
-        self.path = to;
-
-        let path = insert_picture(&conn, &self)?;
-        self.path = path;
-
-        let dst = config.scp_server.clone()
-            + ":"
-            + &config.scp_pic_path
-            + "/"
-            + self.path.clone().file_name().unwrap().to_str().unwrap();
-        match Command::new("scp").arg(&self.path).arg(&dst).output() {
-            Err(e) => {
-                warn!("Upload of picture {:?} to {:?} failed.", &self.path, &dst);
-            }
-            _ => {}
-        };
-        Ok(self.path)
-    }
-}
-
-impl From<PhotographyPicture> for Picture {
-    fn from(p: PhotographyPicture) -> Self {
-        Picture {
-            hash_old: p.hash_old,
-            hash: p.hash,
-            path: p.path,
-        }
-    }
-}
-
-impl PhotographyPicture {
+    /// Reading EXIF and other basic information for pictures
     pub fn read_info(mut self) -> Result<Self, err::Error> {
         //height and width are not stored in exif.
         match size(&self.path) {
@@ -136,23 +83,25 @@ impl PhotographyPicture {
                     self.direction = "Portrait".to_string();
                 }
             }
-            Err(err) => {
+            Err(_) => {
                 warn!("size information for pic {:?} not found", self.path);
                 return Ok(self);
             }
         };
 
-        let mut file = std::fs::File::open(&self.path)?;
+        // Get EXIF
+        let file = std::fs::File::open(&self.path)?;
         let mut bufreader = std::io::BufReader::new(&file);
         let exifreader = exif::Reader::new();
         let exif = match exifreader.read_from_container(&mut bufreader) {
             Ok(exif) => exif,
-            Err(e) => {
+            Err(_) => {
                 warn!("exif information for pic {:?} not found", self.path);
                 return Ok(self);
             }
         };
 
+        // Parse EXIF
         let mut date = String::from("");
         let mut parameters = String::from("");
         let mut camera = String::from("");
@@ -188,6 +137,7 @@ impl PhotographyPicture {
         Ok(self)
     }
 
+    /// Copy and Compress( if necessary )
     pub fn process_and_store(mut self) -> Result<Self, err::Error> {
         let config = GlobalConfig::global();
         let size = std::fs::metadata(&self.path)?.len();
@@ -201,11 +151,13 @@ impl PhotographyPicture {
             return Ok(self);
         };
 
+        // Compress
         info!("Compressing image {:?}", &self.path);
         let mut image = image::io::Reader::open(&self.path)?.decode()?;
         let filter = image::imageops::FilterType::Nearest;
         image = image.resize(1920, 1920, filter);
 
+        // The old and new hash should all be saved
         let hash = sha256::digest(image.as_bytes());
         let save = config
             .pic_local
@@ -224,11 +176,14 @@ impl PhotographyPicture {
         Ok(self)
     }
 
+    /// Register in database and update to server
     pub fn register_and_upload(&mut self) -> Result<(), err::Error> {
+        // Register
         let config = GlobalConfig::global();
         let conn = GlobalConnPool::global().0.get()?;
         insert_photography_picture(&conn, self)?;
 
+        // Upload
         let dst = config.scp_server.clone()
             + ":"
             + &config.scp_pic_path
@@ -236,7 +191,7 @@ impl PhotographyPicture {
             + self.path.file_name().unwrap().to_str().unwrap();
 
         match Command::new("scp").arg(&self.path).arg(&dst).output() {
-            Err(e) => {
+            Err(_) => {
                 warn!("Upload of picture {:?} to {:?} failed.", &self.path, &dst);
             }
             _ => {}
@@ -245,7 +200,74 @@ impl PhotographyPicture {
     }
 }
 
+/// Pictures
+#[derive(Debug)]
+pub struct Picture {
+    pub hash_old: Option<String>,
+    pub hash: String,
+    pub path: PathBuf,
+}
+
+impl Picture {
+    pub fn from_dir(p: PathBuf) -> Result<Self, err::Error> {
+        let bytes = std::fs::read(&p)?;
+        let hash = sha256::digest(&*bytes);
+        Ok(Picture {
+            hash_old: None,
+            hash,
+            path: p,
+        })
+    }
+
+    /// storing in filesystem, registering in db, and uploading to server
+    pub fn register(mut self) -> Result<PathBuf, err::Error> {
+        let config = GlobalConfig::global();
+        let conn = GlobalConnPool::global().0.get().unwrap();
+
+        // Storing
+        let to = config.pic_local.join(
+            self.hash.clone() + "." + self.path.clone().extension().unwrap().to_str().unwrap(),
+        );
+        if let Some(p) = find_picture(&conn, &self)? {
+            return Ok(p);
+        }
+        std::fs::copy(&self.path, &to)?;
+        self.path = to;
+
+        // Registering
+        // MAYBE a quick return should happen here?
+        let path = insert_picture(&conn, &self)?;
+        self.path = path;
+
+        // Uploading
+        let dst = config.scp_server.clone()
+            + ":"
+            + &config.scp_pic_path
+            + "/"
+            + self.path.clone().file_name().unwrap().to_str().unwrap();
+        match Command::new("scp").arg(&self.path).arg(&dst).output() {
+            Err(_) => {
+                warn!("Upload of picture {:?} to {:?} failed.", &self.path, &dst);
+            }
+            _ => {}
+        };
+
+        Ok(self.path)
+    }
+}
+
+impl From<PhotographyPicture> for Picture {
+    fn from(p: PhotographyPicture) -> Self {
+        Picture {
+            hash_old: p.hash_old,
+            hash: p.hash,
+            path: p.path,
+        }
+    }
+}
+
 /// struct used for tera rendering
+/// removed thos Option types
 #[derive(Serialize, Clone)]
 pub struct PhotographyPictureBrief {
     pub selected: bool,

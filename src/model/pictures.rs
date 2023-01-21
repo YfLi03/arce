@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use log::debug;
-use rusqlite::{params,Connection};
+use rusqlite::{params, Connection};
 
 use crate::api::err;
 use crate::api::pictures::{PPictureList, PhotographyPicture, Picture};
@@ -23,7 +23,7 @@ pub fn find_picture(conn: &Connection, p: &Picture) -> Result<Option<PathBuf>, e
             return Ok(Some(PathBuf::from(row.get::<&str, String>("PATH")?)));
         };
     };
-    
+
     Ok(None)
 }
 
@@ -55,7 +55,6 @@ pub fn insert_photography_picture(
     conn: &Connection,
     p: &mut PhotographyPicture,
 ) -> Result<PathBuf, err::Error> {
-
     let mut stmt = conn.prepare(
         "SELECT * FROM pictures WHERE \
     HASH = ?1 AND PHOTOGRAPHY = true",

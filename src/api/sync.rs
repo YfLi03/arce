@@ -1,6 +1,7 @@
 use once_cell::sync::OnceCell;
 use std::sync::Mutex;
 
+/// Global Database Connection Pool
 pub type ConnPool = r2d2::Pool<r2d2_sqlite::SqliteConnectionManager>;
 #[derive(Debug)]
 pub struct GlobalConnPool(pub ConnPool);
@@ -15,6 +16,7 @@ impl GlobalConnPool {
 
 pub static CONN_POOL: OnceCell<GlobalConnPool> = OnceCell::new();
 
+/// A global var indicating the necessity to deploy
 #[derive(Debug)]
 pub struct NeedPublish(Mutex<bool>);
 
