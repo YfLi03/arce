@@ -1,16 +1,16 @@
 title: SOMEONE
 subtitle: vision
 foot: someone © 2022
-beian: 沪ICP备XXXXXX号
+bei_an: 〇ICP备XXXXXX号
 
 pic_cloud_prefix: http://xxx.xxx.com
 pic_local: /Users/xxx/xxx
 pic_compress_threshold: 10000000
 pic_replace_prefix: /Users/xxx
 
-scp_server: tcloud
+scp_server: xxxcloud
 scp_pic_path: /web/test/pic
 scp_web_path: /web/test
 
 deploy_auto: true
-deploy_interval: 10
+deploy_interval: 30
