@@ -1,8 +1,10 @@
 use lazy_static::lazy_static;
 use log::{debug, info};
 use serde::Serialize;
+use sitemap::structs::UrlEntry;
+use sitemap::{structs::UrlEntryBuilder, writer::SiteMapWriter};
 use slug::slugify;
-use std::{cmp::min, io::Write, path::PathBuf};
+use std::{cell::RefCell, cmp::min, io::Write, path::PathBuf};
 use tera::{Context, Tera};
 
 use crate::api::{articles::Article, config::GlobalConfig, err, pictures::PhotographyPictureBrief};
@@ -73,6 +75,8 @@ lazy_static! {
     pub static ref TERA: Tera = Tera::new("template/**/*.html").unwrap();
 }
 
+thread_local! {static URL_ENTRY: RefCell<Vec<UrlEntryBuilder>> = RefCell::new(vec![])}
+
 /// generate html(s)
 fn gen_html(context: &Context, template: &str, dst: &str) -> Result<(), err::Error> {
     let path = PathBuf::from(dst);
@@ -98,6 +102,11 @@ fn index(articles: Vec<Article>) -> Result<(), err::Error> {
     let headlines: Vec<Article> = articles.into_iter().filter(|a| a.headline).collect();
     let page = (headlines.len()) / 20 + 1;
 
+    URL_ENTRY.with(|v| {
+        // Assuming index is set to /index/1.html
+        (*v.borrow_mut()).push(UrlEntry::builder().loc(config.url.clone()));
+    });
+
     for i in 1..=page {
         context.insert(
             "article_briefs",
@@ -110,6 +119,14 @@ fn index(articles: Vec<Article>) -> Result<(), err::Error> {
             "category.html",
             &("public/index/".to_string() + &i.to_string() + ".html"),
         )?;
+
+        URL_ENTRY.with(|v| {
+            // Assuming index is set to /index/1.html
+            (*v.borrow_mut()).push(
+                UrlEntry::builder()
+                    .loc(config.url.clone() + &"/index/".to_string() + &i.to_string() + ".html"),
+            );
+        });
     }
     Ok(())
 }
@@ -130,6 +147,12 @@ fn article(articles: Vec<Article>, c: Category) -> Result<(), err::Error> {
         context.insert("article", &a);
 
         gen_html(&context, "article.html", &("public".to_string() + &a.url))?;
+
+        URL_ENTRY.with(|v| {
+            (*v.borrow_mut()).push(
+                UrlEntry::builder().loc(config.url.clone() + "/" + a.url.clone().trim_matches('/')),
+            );
+        });
     }
     Ok(())
 }
@@ -146,6 +169,10 @@ fn category(c: Category, a: Vec<Article>) -> Result<(), err::Error> {
 
     context.insert("article_briefs", &articles);
     gen_html(&context, "category.html", &("public/".to_string() + &c.url))?;
+
+    URL_ENTRY.with(|v| {
+        (*v.borrow_mut()).push(UrlEntry::builder().loc(config.url.clone() + "/" + &c.url));
+    });
 
     article(articles, c)?;
 
@@ -177,6 +204,11 @@ fn article_category(articles: Vec<Article>) -> Result<(), err::Error> {
         "public/article_category.html",
     )?;
 
+    URL_ENTRY.with(|v| {
+        (*v.borrow_mut())
+            .push(UrlEntry::builder().loc(config.url.clone() + "/article_category.html"));
+    });
+
     for c in categories {
         category(c, articles.clone())?;
     }
@@ -206,6 +238,13 @@ fn gallery(mut pictures: Vec<PhotographyPictureBrief>) -> Result<(), err::Error>
             "picture.html",
             &("public/gallery/".to_string() + &i.to_string() + ".html"),
         )?;
+
+        URL_ENTRY.with(|v| {
+            (*v.borrow_mut()).push(
+                UrlEntry::builder()
+                    .loc(config.url.clone() + &"/gallery/".to_string() + &i.to_string() + ".html"),
+            );
+        });
     }
 
     Ok(())
@@ -233,22 +272,60 @@ fn picture(pictures: Vec<PhotographyPictureBrief>) -> Result<(), err::Error> {
             "picture.html",
             &("public/picture/".to_string() + &i.to_string() + ".html"),
         )?;
+
+        URL_ENTRY.with(|v| {
+            (*v.borrow_mut()).push(
+                UrlEntry::builder()
+                    .loc(config.url.clone() + &"/picture/".to_string() + &i.to_string() + ".html"),
+            );
+        });
     }
 
     Ok(())
 }
 
+fn sitemap() -> Result<(), err::Error> {
+    let config = GlobalConfig::global();
+    if let None = config.robot {
+        return Ok(());
+    };
+
+    let mut robot = std::fs::File::create("public/robots.txt")?;
+    robot.write(
+        (String::from("Sitemap: ") + &config.url + "/" + config.robot.as_ref().unwrap()).as_bytes(),
+    )?;
+
+    let mut site_map =
+        std::fs::File::create(PathBuf::from("public").join(config.robot.as_ref().unwrap()))?;
+    let writer = SiteMapWriter::new(&mut site_map);
+    let mut writer = writer.start_urlset()?;
+    URL_ENTRY.with(|v| {
+        for i in &*v.borrow() {
+            writer
+                .url(i.clone().build().unwrap())
+                .expect("Unable To Write Url");
+        }
+    });
+
+    Ok(())
+}
+
 /// render all pages
+/// sitemap is generated at the same time
 pub fn render(
     articles: Vec<Article>,
     pictures: Vec<PhotographyPictureBrief>,
 ) -> Result<(), err::Error> {
     info!("Rendering");
 
+    URL_ENTRY.with(|v| *v.borrow_mut() = vec![]);
+    
     index(articles.clone())?;
     article_category(articles.clone())?;
     gallery(pictures.clone())?;
     picture(pictures.clone())?;
+
+    sitemap()?;
 
     info!("Rendered");
     Ok(())

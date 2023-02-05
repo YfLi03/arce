@@ -108,3 +108,13 @@ impl From<serde_yaml::Error> for Error {
         }
     }
 }
+
+impl From<sitemap::Error> for Error {
+    fn from(err: sitemap::Error) -> Self {
+        warn!("{:?}", err);
+        Error {
+            reason: Reason::Filesystem,
+            message: err.to_string(),
+        }
+    }
+}

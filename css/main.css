@@ -32,8 +32,8 @@
 }
 
 .typora p {
-    margin: 0, 0, 20px, 0;
-    line-height: 1.8;
+    margin: 0, 0, 15px, 0;
+    line-height: 1.7;
 }
 
 .typora blockquote {
@@ -42,6 +42,20 @@
 
 .typora h1,h2,h3,h4 {
     margin-top: 50px;
+    margin-bottom: 1rem;
     font-weight: bold;
 }
 
+.typora h3 {
+    font-size: 2rem;
+}
+
+.typora h4 {
+    font-size: 1.8rem;
+}
+
+.typora h5 {
+    font-size: 1.45rem;
+    margin-top: 30px;
+    margin-bottom: 1rem;
+}

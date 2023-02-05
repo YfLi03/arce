@@ -12,6 +12,8 @@ pub struct GlobalConfig {
     pub subtitle: String,
     pub foot: String,
     pub bei_an: Option<String>,
+    pub url: String,
+    pub robot: Option<String>,
 
     pub pic_cloud_prefix: String,
     pub pic_local: PathBuf,

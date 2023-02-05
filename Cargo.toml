@@ -26,5 +26,6 @@ once_cell = "1.17.0"
 clap = { version = "3.2.17", features = ["derive"] }
 slug = "0.1.4"
 text_io = "0.1.10"
+sitemap = "0.4"
 
 
