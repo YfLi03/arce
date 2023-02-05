@@ -225,7 +225,7 @@ fn gallery(mut pictures: Vec<PhotographyPictureBrief>) -> Result<(), err::Error>
     context.insert("page", &Page::new(1, "照片 | ".to_string() + &config.title));
     pictures = pictures.into_iter().filter(|p| p.selected).collect();
 
-    let page = (pictures.len()) / 20 + 1;
+    let page = (pictures.len()-1) / 20 + 1;
 
     for i in 1..=page {
         context.insert(
@@ -258,7 +258,7 @@ fn picture(pictures: Vec<PhotographyPictureBrief>) -> Result<(), err::Error> {
     context.insert("need_nav", &true);
     context.insert("page", &Page::new(3, "图库 | ".to_string() + &config.title));
 
-    let page = (pictures.len()) / 20 + 1;
+    let page = (pictures.len()-1) / 20 + 1;
 
     for i in 1..=page {
         context.insert(
