@@ -306,6 +306,7 @@ fn sitemap() -> Result<(), err::Error> {
                 .expect("Unable To Write Url");
         }
     });
+    writer.end()?;
 
     Ok(())
 }
