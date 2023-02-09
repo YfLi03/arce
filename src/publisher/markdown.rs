@@ -68,6 +68,9 @@ fn read_article_header(content: String) -> Result<Article, err::Error> {
         category: yaml.category.unwrap_or(String::from("未分类")),
         headline: yaml.headline.unwrap_or(false),
         content: body,
+        encrypt: yaml.password.is_some(),
+        password: yaml.password.unwrap_or(String::new()),
+        hint: yaml.hint.unwrap_or(String::new())
     })
 }
 

@@ -8,6 +8,7 @@ use std::{cell::RefCell, cmp::min, io::Write, path::PathBuf};
 use tera::{Context, Tera};
 
 use crate::api::{articles::Article, config::GlobalConfig, err, pictures::PhotographyPictureBrief};
+use crate::publisher::encrypter;
 
 /// Page Info context for Tera
 #[derive(Serialize, Clone)]
@@ -69,6 +70,13 @@ impl Category {
             title: s,
         }
     }
+}
+
+#[derive(Serialize)]
+struct Encrypt {
+    pub hint: String,
+    pub content: String,
+    pub iv: String
 }
 
 lazy_static! {
@@ -146,8 +154,17 @@ fn article(articles: Vec<Article>, c: Category) -> Result<(), err::Error> {
         );
         context.insert("article", &a);
 
-        gen_html(&context, "article.html", &("public".to_string() + &a.url))?;
-
+        if a.encrypt {
+            context.insert("encrypt", &Encrypt{
+                content: encrypter::encrypt(a.content, a.password)?,
+                hint: a.hint,
+                iv: config.iv.clone().unwrap()
+            });
+            gen_html(&context, "article-enc.html", &("public".to_string() + &a.url))?;
+        } else {
+            gen_html(&context, "article.html", &("public".to_string() + &a.url))?;
+        }
+        
         URL_ENTRY.with(|v| {
             (*v.borrow_mut()).push(
                 UrlEntry::builder().loc(config.url.clone() + "/" + a.url.clone().trim_matches('/')),

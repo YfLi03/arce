@@ -16,3 +16,5 @@ scp_web_path: /web/test
 
 deploy_auto: true
 deploy_interval: 30
+
+iv: itshouldbe16char

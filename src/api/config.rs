@@ -26,6 +26,8 @@ pub struct GlobalConfig {
 
     pub deploy_auto: bool,
     pub deploy_interval: Option<u64>,
+
+    pub iv: Option<String>,
 }
 
 /// OnceCell variable to make it static

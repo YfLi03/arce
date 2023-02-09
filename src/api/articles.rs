@@ -36,10 +36,13 @@ pub struct Article {
     pub category: String,
     pub headline: bool,
     pub content: String,
+    pub encrypt: bool,
+    pub password: String,
+    pub hint: String
 }
 
 /// Struct used for parsing Yaml Front Matter in articles
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct ArticleYaml {
     pub title: String,
     pub path: Option<String>,
@@ -47,4 +50,6 @@ pub struct ArticleYaml {
     pub category: Option<String>,
     pub headline: Option<bool>,
     pub summary: Option<String>,
+    pub password: Option<String>,
+    pub hint: Option<String>
 }

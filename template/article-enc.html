@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+    {% include "partial/head.html" %}
+
+<body>
+<div class="container-fluid bg-light pt-0 pb-3 px-0">
+    {% include "partial/header.html" %}
+
+    <div class="row p-3">
+        <div class="col-0 col-lg-2"></div>
+        <div class="col-12 col-lg-8">
+                
+                <div class="typora">
+                    <h2>{{article.title}}</h2>
+                    <center>{{article.date}}</center>
+                    <center>分类: <a href="/{{category.url}}" style="color:black; text-decoration: underline;">{{category.title}}</a></center>
+                    <br/>
+                    <div id="content">
+
+                        <div class="hint">
+                            提示: {{encrypt.hint}}
+                        </div>
+
+                        <div class="password_input">
+                            <input id="password"/>
+                            <button type="button" onclick="decrypt()">确定</button>
+                        </div>
+
+                        <div id="msg">
+                            这是一篇需要密码才能访问的文章。
+                        </div>
+
+                        <script>
+                            function decrypt (){
+                                var content_encrypted = "{{encrypt.content}}";
+                                content_encrypted = forge.util.hexToBytes(content_encrypted);
+                                var iv = "{{encrypt.iv}}";
+
+                                // Generate key from password
+                                var password = document.getElementById("password").value;
+                                var key = '';
+                                var loc = 0;
+                                for (var i = 0; i < 16; i++ ){
+                                    key += password[loc];
+                                    loc = (loc + 1) % (password.length)
+                                }
+
+                                // Decryption
+                                var buf = forge.util.createBuffer(content_encrypted);
+                                var decipher = forge.cipher.createDecipher('AES-CBC', key);
+                                decipher.start({iv: iv});
+                                decipher.update(buf);
+                                var result = decipher.finish();
+
+                                if (result == false) {
+                                    document.getElementById("msg").innerHTML = "密码错误";
+                                    return;
+                                }
+
+                                // Turning u8s into unicode(U16)
+                                var hex = decipher.output.toHex();
+                                var typedArray = new Uint8Array(hex.match(/[\da-f]{2}/gi).map(function (h) {
+                                    return parseInt(h, 16)
+                                }))
+                                var content = new TextDecoder().decode(typedArray)
+
+                                document.getElementById("content").innerHTML = content;
+
+                            }
+
+                        </script>
+                    </div>
+               </div>
+        </div>
+        <div class="col-0 col-lg-2"></div>
+    </div>
+    {% include "partial/footer.html" %}
+       
+  </div>
+
+  
+

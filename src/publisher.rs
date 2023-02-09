@@ -1,6 +1,7 @@
 mod deployer;
 mod markdown;
 mod renderer;
+mod encrypter;
 
 use log::{info, warn};
 use std::{
