@@ -20,6 +20,7 @@ Current Version: `1.0.2`
 - （流程）配置好后，可一键，甚至是全自动生成并部署整个站点
 - （存储）在任何你习惯的本地路径中写作，无需将源文件放入 posts 文件夹内；同时，还支持多（文件夹）文章来源，对应不同网页路径
 - （摄影）自动从Exif中抓取光圈快门ISO、拍摄时间等信息；自动压缩尺寸大的图片；对于 md 文章内，路径为本地的照片，会自动上传到服务器上并进行路径替换
+- （加密）可以对文章进行加密，无法通过查看 html 等方式破解
 
 
 ## 代码说明
@@ -40,4 +41,21 @@ Current Version: `1.0.2`
 - pulldown-cmark    Markdown 渲染
 - r2d2_sqlite       持久化
 - notify            文件夹监测
+- aes/cbc           加密文章
+
+## Yaml From Matter
+
+在每篇文章开头请配置这些信息：
+
+```yaml
+title: 标题
+date: 日期（不作解析，请自行决定格式）
+category: 归类
+deploy: [true / false] 若不为 deploy: true 则不会部署到网站
+path: [可选] 文章路径，不填写则会自动生成。
+headline: [true / false] （是否显示在首页）
+summary: [true / false] 文章概述，会显示在文章列表页
+password: [可选] 如果要用密码加密文章，请添加此项并写上密码
+hint: [可选] 密码的提示
+```
 
