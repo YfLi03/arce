@@ -64,6 +64,11 @@
                                 }))
                                 var content = new TextDecoder().decode(typedArray)
 
+                                if (content[0] != "<") {
+                                    document.getElementById("msg").innerHTML = "密码错误";
+                                    return;
+                                }
+
                                 document.getElementById("content").innerHTML = content;
 
                             }
