@@ -1,6 +1,6 @@
 use exif::{In, Tag};
 use imagesize::size;
-use log::{debug, info, warn};
+use log::{info, warn};
 use serde::Serialize;
 use std::path::PathBuf;
 use std::process::Command;
@@ -284,7 +284,6 @@ pub struct PhotographyPictureBrief {
 
 impl From<PhotographyPicture> for PhotographyPictureBrief {
     fn from(p: PhotographyPicture) -> Self {
-        debug!("Converting PP to PPB {:?}", p);
         PhotographyPictureBrief {
             selected: p.selected,
             title: p.title,

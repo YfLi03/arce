@@ -1,4 +1,4 @@
-use log::warn;
+use log::{warn, info};
 use aes::cipher::{block_padding::Pkcs7, BlockEncryptMut, KeyIvInit};
 
 use crate::api::err;
@@ -20,6 +20,7 @@ fn array2string(enc: &[u8]) -> Result<String, err::Error> {
 
 
 pub fn encrypt(content: String, password: String) -> Result<String, err::Error> {
+    info!("Encrypting");
     let config = GlobalConfig::global();
 
     // Right now the same iv is used for every article
@@ -51,5 +52,6 @@ pub fn encrypt(content: String, password: String) -> Result<String, err::Error> 
         .encrypt_padded_mut::<Pkcs7>(&mut buf, content.len())
         .unwrap();
 
+    info!("Encrypted");
     Ok(array2string(encrypted)?)
 }

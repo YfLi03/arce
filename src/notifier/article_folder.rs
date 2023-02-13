@@ -49,8 +49,8 @@ fn watch_article_folder(folder: ArticleFolder, pool: ConnPool) -> Result<(), err
             Err(e) => return Err(e.into()),
         };
 
-        // notifiers' event classification seems not to be working well.
-        // deleting may not work, modifications may have wrong modifykind
+        // notifiers' event classification seems not to work well.
+        // delete may not work, modifications may have wrong modifykind
         match event.kind {
             EventKind::Create(CreateKind::File) => {
                 add_article(event.paths[0].clone(), &folder, &pool)?;
@@ -88,7 +88,7 @@ fn find_deploy_flag(path: &PathBuf) -> Result<bool, err::Error> {
 
 /// updating an article if necessary
 fn add_article(p: PathBuf, f: &ArticleFolder, pool: &ConnPool) -> Result<(), err::Error> {
-    info!("Adding Article {:?}", p);
+    info!("Juding Article {:?}", p);
 
     // if you have soft-linked files or whatever (like onedrive)
     // two unique path for the same file may be captured
@@ -103,16 +103,17 @@ fn add_article(p: PathBuf, f: &ArticleFolder, pool: &ConnPool) -> Result<(), err
         return Ok(());
     };
 
+    info!("Adding Article{:?}", p);
     update_article(&pool.get().unwrap(), ArticleInfo::new(p, f.deploy.clone()))?;
     Ok(())
 }
 
 /// deleting an article if necessary. may not work properly
 fn remove_article(p: PathBuf, pool: &ConnPool) -> Result<(), err::Error> {
-    info!("Removing Article {:?}", p);
     if !is_markdown(&p) {
         return Ok(());
     };
+    info!("Removing Article {:?}", p);
     delete_article(&pool.get().unwrap(), p)?;
     Ok(())
 }

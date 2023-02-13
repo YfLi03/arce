@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+use log::info;
 use rusqlite::params;
 use rusqlite::Connection;
 
@@ -58,6 +59,7 @@ pub fn add_picture_folder(conn: &Connection, f: PictureFolder) -> Result<(), err
 
 /// initializing folders
 pub fn init(conn: &Connection) -> Result<(), err::Error> {
+    info!("Initializing Folders Model");
     conn.execute(
         "CREATE TABLE IF NOT EXISTS article_folders (\
         ID      INTEGER     PRIMARY KEY AUTOINCREMENT,  \

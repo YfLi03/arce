@@ -302,6 +302,7 @@ fn picture(pictures: Vec<PhotographyPictureBrief>) -> Result<(), err::Error> {
 }
 
 fn sitemap() -> Result<(), err::Error> {
+    info!("Dealing With Sitemap");
     let config = GlobalConfig::global();
     if let None = config.robot {
         return Ok(());
@@ -325,6 +326,7 @@ fn sitemap() -> Result<(), err::Error> {
     });
     writer.end()?;
 
+    info!("Sitemap Written");
     Ok(())
 }
 

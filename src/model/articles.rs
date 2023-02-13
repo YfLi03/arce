@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+use log::info;
 use rusqlite::params;
 use rusqlite::Connection;
 
@@ -57,6 +58,7 @@ pub fn delete_article(conn: &Connection, p: PathBuf) -> Result<(), err::Error> {
 
 /// initializing the articles table
 pub fn init(conn: &Connection) -> Result<(), err::Error> {
+    info!("Initializing Articles Model");
     conn.execute(
         "CREATE TABLE IF NOT EXISTS articles (\
         PATH            TEXT        NOT NULL,\

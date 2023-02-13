@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use log::debug;
+use log::{debug, info};
 use rusqlite::{params, Connection};
 
 use crate::api::err;
@@ -116,11 +116,13 @@ pub fn get_photography_pictures(conn: &Connection) -> Result<PPictureList, err::
             article_link: row.get("ARTICLE")?,
         })
     }
+    info!("Gotten {} pictures", pictures.len());
     Ok(pictures)
 }
 
 /// initializing pictures table
 pub fn init(conn: &Connection) -> Result<(), err::Error> {
+    info!("Initializing Picture Model");
     conn.execute(
         "CREATE TABLE IF NOT EXISTS pictures (\
         ID              INTEGER     PRIMARY KEY AUTOINCREMENT,  \

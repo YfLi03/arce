@@ -111,5 +111,6 @@ pub fn process_articles() -> Result<Vec<Article>, err::Error> {
         })
         .collect::<Vec<Article>>();
     articles.sort_by(|a, b| (&b.date).cmp(&a.date));
+    info!("Handled {} articles in total",articles.len());
     Ok(articles)
 }
