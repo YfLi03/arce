@@ -43,7 +43,7 @@ Current Version: `1.0.2`
 - notify            文件夹监测
 - aes/cbc           加密文章
 
-## Yaml From Matter
+## Yaml Front Matter
 
 在每篇文章开头请配置这些信息：
 
